@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.demyanets.andrey.mytmdbapp.R
+import com.demyanets.andrey.mytmdbapp.RequestResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.MalformedURLException
@@ -48,14 +49,21 @@ class TestFragment: Fragment() {
         })
     }
 
-    private fun requestCompletion(data: String?): Unit {
+    private fun requestCompletion(result: RequestResult): Unit {
         activity?.runOnUiThread {
-            label.text = data
-            Toast.makeText(activity, "GGG", Toast.LENGTH_LONG).show()
+            when(result) {
+                is RequestResult.Success -> {
+                    label.text = result.data
+                    Toast.makeText(activity, result.data, Toast.LENGTH_LONG).show()
+                }
+                is RequestResult.Error -> {
+                    Toast.makeText(activity, result.e.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 
-    private fun makeRequest(cb: (data: String?) -> Unit) {
+    private fun makeRequest(cb: (result: RequestResult) -> Unit) {
         label.text = "Button Pressed!"
 
         var conn: HttpsURLConnection? = null
@@ -66,11 +74,14 @@ class TestFragment: Fragment() {
             conn.requestMethod = "GET"
             conn.connectTimeout = 3000
 
-            cb(BufferedReader(InputStreamReader(conn.inputStream)).text())
+            val data = BufferedReader(InputStreamReader(conn.inputStream)).text()
+            val result = RequestResult.Success(data)
+            cb(result)
+
         } catch (e: MalformedURLException) {
-            Toast.makeText(activity, e.toString(), Toast.LENGTH_LONG).show()
+            cb(RequestResult.Error(e))
         } catch (e: Exception) {
-            Toast.makeText(activity, e.toString(), Toast.LENGTH_LONG).show()
+            cb(RequestResult.Error(e))
         } finally {
             conn?.disconnect()
         }
