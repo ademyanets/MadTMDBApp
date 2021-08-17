@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -25,6 +26,9 @@ class TestFragment: Fragment() {
     lateinit var button: Button
     lateinit var label: TextView
     lateinit var repository: TmdbRepository
+    lateinit var input: EditText
+
+    val DEFAULT_ID: String = "550"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +50,13 @@ class TestFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        this.input = view.findViewById(R.id.test_input)
+        this.input.setText(DEFAULT_ID, TextView.BufferType.EDITABLE) //это нормально? что пиздец Сережа!
         this.button = view.findViewById(R.id.test_button)
         this.label = view.findViewById(R.id.test_title_text)
         button.setOnClickListener {
-            repository.getMovie(550, ::requestCompletion)
+            val id = Integer.valueOf(input.text.toString())
+            repository.getMovie(id, ::requestCompletion)
         }
     }
 
