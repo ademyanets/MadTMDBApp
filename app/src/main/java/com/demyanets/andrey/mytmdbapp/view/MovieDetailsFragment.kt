@@ -4,12 +4,13 @@ import android.os.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import coil.load
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
@@ -17,11 +18,12 @@ import java.io.BufferedReader
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.stream.Collectors
 
-class TestFragment: Fragment() {
+class MovieDetailsFragment: Fragment() {
 
-    lateinit var button: Button
-    lateinit var label: TextView
-    lateinit var input: EditText
+    lateinit var text: TextView
+    lateinit var title: TextView
+    lateinit var image: ImageView
+    lateinit var spinner: ProgressBar
 
     lateinit var repository: TmdbRepository
 
@@ -44,29 +46,29 @@ class TestFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.test_fragment, container, false)
+        return inflater.inflate(R.layout.details_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        this.input = view.findViewById(R.id.test_input)
-        this.input.setText(DEFAULT_ID.toString())
-        this.button = view.findViewById(R.id.test_button)
-        this.label = view.findViewById(R.id.test_title_text)
-        button.setOnClickListener {
-            val id = Integer.valueOf(input.text.toString())
-            repository.getMovie(id, ::requestCompletion)
-        }
+        this.title = view.findViewById<TextView>(R.id.movie_details_title)
+        this.text = view.findViewById<TextView>(R.id.movie_details_review)
+        this.image = view.findViewById<ImageView>(R.id.movie_details_image)
+        this.spinner = view.findViewById<ProgressBar>(R.id.movie_details_spinner)
+        this.spinner.visibility = View.VISIBLE
     }
-
+//TODO: add loader for bacdrop image
     private fun requestCompletion(result: RequestResult) {
         when(result) {
             is RequestResult.EmptyResultSuccess -> TODO()
             is RequestResult.Error -> Toast.makeText(activity, result.e.toString(), Toast.LENGTH_LONG).show()
             is RequestResult.ObjSuccess<*> -> {
                 val movie = result.data as MovieDTO //TODO: FIXME:
-                label.text = "${movie.title}: ${movie.overview}"
+                title.setText(movie.title)
+                text.setText(movie.overview)
+                image.load("https://image.tmdb.org/t/p/original${movie.backdrop_path}")//FIXME: add /configuration request
+                spinner.visibility = View.GONE
                 Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
             }
         }
