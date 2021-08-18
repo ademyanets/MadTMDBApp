@@ -33,8 +33,6 @@ class TopRatedFragment: Fragment() {
         val tp: ThreadPoolExecutor = app.threadPoolExecutor
         val handler = Handler(Looper.getMainLooper())
         repository = NetworkRepository(tp, handler)
-        repository.getTopRated(0, ::requestCompletion)
-        
     }
 
     override fun onCreateView(
@@ -50,6 +48,7 @@ class TopRatedFragment: Fragment() {
 
         spinner = view.findViewById<ProgressBar>(R.id.top_rated_spinner)
         spinner.visibility = View.VISIBLE
+        repository.getTopRated(0, ::requestCompletion)
 
         TopRatedAdapter.Companion.itemOnClick = ::onSelectItem
         table = view.findViewById<RecyclerView>(R.id.recycler_view)
@@ -59,11 +58,13 @@ class TopRatedFragment: Fragment() {
         }
     }
 
+    //! Callback. When user selects a movie from list
     private fun onSelectItem(movie: ResultDTO) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
         (activity as MainActivity).switchToMovieDetailsFragment(movie)
     }
 
+    //! Callback. When top rated list request completes
     private fun requestCompletion(result: RequestResult) {
         when(result) {
             is RequestResult.EmptyResultSuccess -> TODO()

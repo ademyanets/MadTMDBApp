@@ -25,8 +25,6 @@ class TopRatedAdapter(private val dataSet: Array<ResultDTO>) :
             categoryView = view.findViewById(R.id.item_category)
             textView = view.findViewById(R.id.item_text)
         }
-
-
     }
 
     // Create new views (invoked by the layout manager)
