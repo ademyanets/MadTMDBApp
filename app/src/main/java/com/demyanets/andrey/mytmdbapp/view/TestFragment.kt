@@ -25,8 +25,9 @@ class TestFragment: Fragment() {
 
     lateinit var button: Button
     lateinit var label: TextView
-    lateinit var repository: TmdbRepository
     lateinit var input: EditText
+
+    lateinit var repository: TmdbRepository
 
     val DEFAULT_ID: String = "550"
 
