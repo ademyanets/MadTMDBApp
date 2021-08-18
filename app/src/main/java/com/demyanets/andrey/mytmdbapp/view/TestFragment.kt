@@ -25,7 +25,7 @@ class TestFragment: Fragment() {
 
     lateinit var repository: TmdbRepository
 
-    val DEFAULT_ID: String = "550"
+    val DEFAULT_ID: Int = 550
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +34,9 @@ class TestFragment: Fragment() {
         val tp: ThreadPoolExecutor = app.threadPoolExecutor
         val handler = Handler(Looper.getMainLooper())
         repository = NetworkRepository(tp, handler)
+
+        val id = arguments?.getInt("id") ?: DEFAULT_ID
+        (repository as NetworkRepository).getMovie(id, ::requestCompletion)
     }
 
     override fun onCreateView(
@@ -48,7 +51,7 @@ class TestFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         this.input = view.findViewById(R.id.test_input)
-        this.input.setText(DEFAULT_ID, TextView.BufferType.EDITABLE) //это нормально? что пиздец Сережа!
+        this.input.setText(DEFAULT_ID.toString())
         this.button = view.findViewById(R.id.test_button)
         this.label = view.findViewById(R.id.test_title_text)
         button.setOnClickListener {

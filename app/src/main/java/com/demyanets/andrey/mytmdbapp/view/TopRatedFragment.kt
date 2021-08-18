@@ -11,10 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.demyanets.andrey.mytmdbapp.NetworkRepository
-import com.demyanets.andrey.mytmdbapp.R
-import com.demyanets.andrey.mytmdbapp.TmdbApplication
-import com.demyanets.andrey.mytmdbapp.TmdbRepository
+import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
@@ -37,6 +34,7 @@ class TopRatedFragment: Fragment() {
         val handler = Handler(Looper.getMainLooper())
         repository = NetworkRepository(tp, handler)
         repository.getTopRated(0, ::requestCompletion)
+        
     }
 
     override fun onCreateView(
@@ -63,6 +61,7 @@ class TopRatedFragment: Fragment() {
 
     private fun onSelectItem(movie: ResultDTO) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
+        (activity as MainActivity).switchToMovieDetailsFragment(movie)
     }
 
     private fun requestCompletion(result: RequestResult) {
