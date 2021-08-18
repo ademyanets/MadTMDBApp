@@ -25,6 +25,8 @@ class TopRatedAdapter(private val dataSet: Array<ResultDTO>) :
             categoryView = view.findViewById(R.id.item_category)
             textView = view.findViewById(R.id.item_text)
         }
+
+
     }
 
     // Create new views (invoked by the layout manager)
@@ -41,9 +43,15 @@ class TopRatedAdapter(private val dataSet: Array<ResultDTO>) :
         viewHolder.titleView.text = movie.title
         viewHolder.categoryView.text = movie.vote_average.toString()
         viewHolder.textView.text = movie.overview
+        viewHolder.itemView.setOnClickListener {
+            Companion.itemOnClick?.let { it1 -> it1(movie) }
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = dataSet.size
 
+    companion object {
+        var itemOnClick: ((movie: ResultDTO) -> Unit)? = null
+    }
 }

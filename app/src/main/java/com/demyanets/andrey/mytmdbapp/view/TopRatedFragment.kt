@@ -6,6 +6,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +24,7 @@ import java.util.concurrent.ThreadPoolExecutor
 class TopRatedFragment: Fragment() {
 
     lateinit var table: RecyclerView
+    lateinit var spinner: ProgressBar
 
     lateinit var repository: TmdbRepository
 
@@ -47,11 +49,20 @@ class TopRatedFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        spinner = view.findViewById<ProgressBar>(R.id.top_rated_spinner)
+        spinner.visibility = View.VISIBLE
+
+        TopRatedAdapter.Companion.itemOnClick = ::onSelectItem
         table = view.findViewById<RecyclerView>(R.id.recycler_view)
         table.apply {
             adapter = TopRatedAdapter(emptyArray())
             layoutManager = LinearLayoutManager(activity)
         }
+    }
+
+    private fun onSelectItem(movie: ResultDTO) {
+        Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
     }
 
     private fun requestCompletion(result: RequestResult) {
@@ -64,6 +75,7 @@ class TopRatedFragment: Fragment() {
                 table.apply {
                     adapter = TopRatedAdapter(items)
                 }
+                spinner.visibility = View.GONE
             }
         }
     }
