@@ -1,9 +1,8 @@
-package com.demyanets.andrey.mytmdbapp
+package com.demyanets.andrey.mytmdbapp.view
 
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.demyanets.andrey.mytmdbapp.NetworkRepository
+import com.demyanets.andrey.mytmdbapp.R
+import com.demyanets.andrey.mytmdbapp.TmdbApplication
+import com.demyanets.andrey.mytmdbapp.TmdbRepository
+import com.demyanets.andrey.mytmdbapp.model.RequestResult
+import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
+import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
+import com.demyanets.andrey.mytmdbapp.view.adapters.TopRatedAdapter
 import java.util.concurrent.ThreadPoolExecutor
 
 class TopRatedFragment: Fragment() {

@@ -1,7 +1,6 @@
 package com.demyanets.andrey.mytmdbapp.view
 
 import android.os.*
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +11,11 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.demyanets.andrey.mytmdbapp.*
+import com.demyanets.andrey.mytmdbapp.model.RequestResult
+import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
 import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.MalformedURLException
-import java.net.URI
-import java.net.URL
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.stream.Collectors
-import javax.net.ssl.HttpsURLConnection
 
 class TestFragment: Fragment() {
 

@@ -1,4 +1,4 @@
-package com.demyanets.andrey.mytmdbapp
+package com.demyanets.andrey.mytmdbapp.model.dto
 
 data class ProductionCompanyDTO(
     val id: Int,

@@ -2,6 +2,10 @@ package com.demyanets.andrey.mytmdbapp
 
 import android.os.Handler
 import android.util.Log
+import com.demyanets.andrey.mytmdbapp.model.RequestResult
+import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
+import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
+import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.text
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken

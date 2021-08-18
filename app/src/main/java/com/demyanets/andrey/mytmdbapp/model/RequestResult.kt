@@ -1,4 +1,4 @@
-package com.demyanets.andrey.mytmdbapp
+package com.demyanets.andrey.mytmdbapp.model
 
 sealed class RequestResult {
     class EmptyResultSuccess: RequestResult()

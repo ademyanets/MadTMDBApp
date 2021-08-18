@@ -1,4 +1,6 @@
-package com.demyanets.andrey.mytmdbapp
+package com.demyanets.andrey.mytmdbapp.model.dto
+
+import com.demyanets.andrey.mytmdbapp.ProductionCountryDTO
 
 data class MovieDTO(
     val adult: Boolean,

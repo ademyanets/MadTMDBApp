@@ -1,10 +1,12 @@
-package com.demyanets.andrey.mytmdbapp
+package com.demyanets.andrey.mytmdbapp.view.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.demyanets.andrey.mytmdbapp.R
+import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 
 class TopRatedAdapter(private val dataSet: Array<ResultDTO>) :
     RecyclerView.Adapter<TopRatedAdapter.ViewHolder>() {

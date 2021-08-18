@@ -2,7 +2,7 @@ package com.demyanets.andrey.mytmdbapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.demyanets.andrey.mytmdbapp.view.TestFragment
+import com.demyanets.andrey.mytmdbapp.view.TopRatedFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
