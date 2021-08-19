@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import coil.load
+import coil.transform.CircleCropTransformation
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
@@ -52,13 +53,19 @@ class MovieDetailsFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        this.title = view.findViewById<TextView>(R.id.movie_details_title)
-        this.text = view.findViewById<TextView>(R.id.movie_details_review)
-        this.image = view.findViewById<ImageView>(R.id.movie_details_image)
-        this.spinner = view.findViewById<ProgressBar>(R.id.movie_details_spinner)
-        this.spinner.visibility = View.VISIBLE
+        title = view.findViewById<TextView>(R.id.movie_details_title)
+        text = view.findViewById<TextView>(R.id.movie_details_review)
+        image = view.findViewById<ImageView>(R.id.movie_details_image)
+        spinner = view.findViewById<ProgressBar>(R.id.movie_details_spinner)
+        spinner.visibility = View.VISIBLE
+
+        var params = this.image.layoutParams
+        val size = 2 * view.width / 3
+        params.width = size
+        params.height = size
+        image.layoutParams = params
     }
-//TODO: add loader for bacdrop image
+
     private fun requestCompletion(result: RequestResult) {
         when(result) {
             is RequestResult.EmptyResultSuccess -> TODO()
@@ -67,7 +74,12 @@ class MovieDetailsFragment: Fragment() {
                 val movie = result.data as MovieDTO //TODO: FIXME:
                 title.setText(movie.title)
                 text.setText(movie.overview)
-                image.load("https://image.tmdb.org/t/p/original${movie.backdrop_path}")//FIXME: add /configuration request
+                image.load("https://image.tmdb.org/t/p/original${movie.backdrop_path}") {//FIXME: add /configuration request
+                    crossfade(true)
+                    placeholder(R.drawable.ic_backstep_preview)
+                    transformations(CircleCropTransformation())
+                }
+
                 spinner.visibility = View.GONE
                 Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
             }
