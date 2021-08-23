@@ -1,8 +1,10 @@
 package com.demyanets.andrey.mytmdbapp.view
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
@@ -48,13 +51,25 @@ class TopRatedFragment: Fragment() {
 
         spinner = view.findViewById<ProgressBar>(R.id.top_rated_spinner)
         spinner.visibility = View.VISIBLE
-        repository.getTopRated(0, ::requestCompletion)
+        repository.getTopRated(::requestCompletion)
 
         TopRatedAdapter.Companion.itemOnClick = ::onSelectItem
         table = view.findViewById<RecyclerView>(R.id.recycler_view)
         table.apply {
             adapter = TopRatedAdapter(emptyArray())
             layoutManager = LinearLayoutManager(activity)
+
+            addOnScrollListener(object: OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    adapter?.let {
+                        if ((layoutManager as LinearLayoutManager).findLastVisibleItemPosition() == it.itemCount - 1) {
+                            Toast.makeText(activity, "Loading page #${repository.getCurrentPage()}", Toast.LENGTH_SHORT).show()
+                            repository.getTopRated(::requestCompletion)
+                        }
+                    }
+                }
+            })
         }
     }
 
@@ -73,7 +88,10 @@ class TopRatedFragment: Fragment() {
                 val page = result.data as PageResultDTO<ResultDTO>//FIXME: is it optional??
                 val items = page.results.toTypedArray()//FIXME: is it optional??
                 table.apply {
-                    adapter = TopRatedAdapter(items)
+                    (adapter as TopRatedAdapter)?.let {
+                        it.dataSet += items
+                        it.notifyDataSetChanged()
+                    }
                 }
                 spinner.visibility = View.GONE
             }

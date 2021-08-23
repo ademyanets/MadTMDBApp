@@ -16,7 +16,9 @@ import java.util.concurrent.Executor
 import javax.net.ssl.HttpsURLConnection
 
 interface TmdbRepository {
-    fun getTopRated(page: Int, cb: (res: RequestResult) -> Unit ): Unit
+    fun getTopRated(cb: (res: RequestResult) -> Unit ): Unit
+    fun getCurrentPage(): Int
+
     fun getMovie(id: Int, cb: (res: RequestResult) -> Unit): Unit
 }
 
@@ -25,14 +27,34 @@ class NetworkRepository(
         private val resultHandler: Handler
     ): TmdbRepository {
 
-    override fun getTopRated(page: Int, cb: (res: RequestResult) -> Unit) {
+    private var currentPage: Int = -1
+    private var totalPages: Int = 0
+    private var isLoading: Boolean = false
+
+    override fun getCurrentPage(): Int {
+        return  currentPage + 1
+    }
+
+    override fun getTopRated(cb: (res: RequestResult) -> Unit) {
+        if (isLoading) {
+            return
+        }
+        if (currentPage != -1 && currentPage == totalPages -1) {
+            return
+        }
+        currentPage += 1
+        isLoading = true
+
         executor.execute {
             try {
-                val ret = makeGetTopRatedRequest(page)
+                val ret = makeGetTopRatedRequest(currentPage)
                 resultHandler.post { cb(RequestResult.ObjSuccess(ret)) }
+                totalPages = ret.total_pages
             } catch (e: Exception) {
                 Log.d("GGGG", "getTopRated exceoption", e)
                 resultHandler.post { cb(RequestResult.Error(e)) }
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -64,7 +86,7 @@ class NetworkRepository(
 
     private fun makeGetTopRatedRequest(page: Int = 0): PageResultDTO<ResultDTO> {
         val url =
-            URL("https://api.themoviedb.org/3/movie/top_rated?api_key=5a6625fd71210561e22960146bc39db9")
+            URL("https://api.themoviedb.org/3/movie/top_rated?api_key=5a6625fd71210561e22960146bc39db9&page=${currentPage + 1}")
         var conn: HttpsURLConnection = url.openConnection() as HttpsURLConnection
         conn.requestMethod = "GET"
         conn.connectTimeout = 3000

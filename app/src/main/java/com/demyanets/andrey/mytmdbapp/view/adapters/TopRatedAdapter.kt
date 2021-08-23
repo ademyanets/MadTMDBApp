@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.demyanets.andrey.mytmdbapp.R
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 
-class TopRatedAdapter(private val dataSet: Array<ResultDTO>) :
+class TopRatedAdapter(var dataSet: Array<ResultDTO>) :
     RecyclerView.Adapter<TopRatedAdapter.ViewHolder>() {
 
     /**

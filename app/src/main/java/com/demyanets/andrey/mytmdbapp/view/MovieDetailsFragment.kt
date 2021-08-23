@@ -18,6 +18,7 @@ import coil.transform.CircleCropTransformation
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
+import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import java.io.BufferedReader
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.stream.Collectors
@@ -81,22 +82,30 @@ class MovieDetailsFragment: Fragment() {
                 text.setText("${movie.overview}\n\n${movie.homepage}")
                 details.setText("${movie.genres[0].name}\nOverall: ${movie.vote_average}\n\nReleased ${movie.release_date}\n\nBudget ${movie.budget}$")
                 image.load("https://image.tmdb.org/t/p/original${movie.backdrop_path}") //FIXME: add /configuration request
-
-                var ids: Array<Int> = emptyArray()
-                movie.production_companies.forEachIndexed { index, comp ->
-                    var logo = ImageView(activity)
-                    logo.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, 150)//(ConstraintLayout.LayoutParams.WRAP_CONTENT,100)
-                    logo.load("https://image.tmdb.org/t/p/w500${comp.logo_path}")
-                    logo.id = comp.id //FIXME:
-                    ids += logo.id
-                    layout.addView(logo)
-                }
-                companiesFlow.setReferencedIds(ids.toIntArray())
+                addLogos(movie)
 
                 spinner.visibility = View.GONE
                 Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    //! Add logos programmatically via constraint layout flow helper
+    private fun addLogos(movie: MovieDTO) {
+        if (companiesFlow.referencedIds.count() != 0) {
+            return
+        }
+
+        var ids: Array<Int> = emptyArray()
+        movie.production_companies.forEachIndexed { index, comp ->
+            var logo = ImageView(activity)
+            logo.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, 150)
+            logo.load("https://image.tmdb.org/t/p/w500${comp.logo_path}")
+            logo.id = comp.id //FIXME: generate unique id
+            ids += logo.id
+            layout.addView(logo)
+        }
+        companiesFlow.setReferencedIds(ids.toIntArray())
     }
 }
 
