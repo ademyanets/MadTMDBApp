@@ -65,6 +65,7 @@ class TopRatedFragment: Fragment() {
                     adapter?.let {
                         if ((layoutManager as LinearLayoutManager).findLastVisibleItemPosition() == it.itemCount - 1) {
                             Toast.makeText(activity, "Loading page #${repository.getCurrentPage()}", Toast.LENGTH_SHORT).show()
+                            spinner.visibility = View.VISIBLE
                             repository.getTopRated(::requestCompletion)
                         }
                     }
@@ -85,12 +86,17 @@ class TopRatedFragment: Fragment() {
             is RequestResult.EmptyResultSuccess -> TODO()
             is RequestResult.Error -> Toast.makeText(activity, result.e.toString(), Toast.LENGTH_LONG).show()
             is RequestResult.ObjSuccess<*> -> {
-                val page = result.data as PageResultDTO<ResultDTO>//FIXME: is it optional??
-                val items = page.results.toTypedArray()//FIXME: is it optional??
-                table.apply {
-                    (adapter as TopRatedAdapter)?.let {
-                        it.dataSet += items
-                        it.notifyDataSetChanged()
+                val page = result.data as PageResultDTO<ResultDTO>
+
+                page?.let { page
+                    val items = page.results.toTypedArray()
+                    items?.let {
+                        table.apply {
+                            (adapter as TopRatedAdapter)?.let {
+                                it.dataSet += items
+                                it.notifyDataSetChanged()
+                            }
+                        }
                     }
                 }
                 spinner.visibility = View.GONE
