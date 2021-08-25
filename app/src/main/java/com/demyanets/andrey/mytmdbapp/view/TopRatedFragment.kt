@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
@@ -19,6 +20,7 @@ import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.TopRatedAdapter
+import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
 import java.util.concurrent.ThreadPoolExecutor
 
 class TopRatedFragment: Fragment() {
@@ -26,18 +28,8 @@ class TopRatedFragment: Fragment() {
     lateinit var table: RecyclerView
     lateinit var spinner: ProgressBar
 
-    lateinit var repository: TmdbRepository
-
-    //FIXME: инстанцировать и передавать репу а не копипасть в каждый фрагмент
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val app: TmdbApplication = requireActivity().application as TmdbApplication//TODO: can throw!
-        val tp: ThreadPoolExecutor = app.threadPoolExecutor
-        val handler = Handler(Looper.getMainLooper())
-        repository = NetworkRepository(tp, handler)
-    }
-
+    private val viewModel: TopRatedViewModel by viewModels()
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,22 +43,42 @@ class TopRatedFragment: Fragment() {
 
         spinner = view.findViewById<ProgressBar>(R.id.top_rated_spinner)
         spinner.visibility = View.VISIBLE
-        repository.getTopRated(::requestCompletion)
 
-        TopRatedAdapter.Companion.itemOnClick = ::onSelectItem
         table = view.findViewById<RecyclerView>(R.id.recycler_view)
+        TopRatedAdapter.Companion.itemOnClick = ::onSelectItem
+
+        val app: TmdbApplication = requireActivity().application as TmdbApplication //FIXME:
+        app?.let {
+            val tp: ThreadPoolExecutor = app.threadPoolExecutor
+            val handler = Handler(Looper.getMainLooper())
+            viewModel.setRepository(NetworkRepository(tp, handler))
+        }
+
+        viewModel.items.observe(viewLifecycleOwner) {
+            table.apply {
+                (adapter as TopRatedAdapter)?.let { topRatedAdapter ->
+                    topRatedAdapter.dataSet += it
+                    topRatedAdapter.notifyDataSetChanged()
+                    spinner.visibility = View.GONE
+                }
+            }
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            Toast.makeText(activity, "Request error ${it}", Toast.LENGTH_LONG).show()
+        }
+
         table.apply {
             adapter = TopRatedAdapter(emptyArray())
             layoutManager = LinearLayoutManager(activity)
-
-            addOnScrollListener(object: OnScrollListener() {
+            addOnScrollListener(object : OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
                     adapter?.let {
                         if ((layoutManager as LinearLayoutManager).findLastVisibleItemPosition() == it.itemCount - 1) {
-                            Toast.makeText(activity, "Loading page #${repository.getCurrentPage()}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(activity, "Loading page...", Toast.LENGTH_SHORT).show()
                             spinner.visibility = View.VISIBLE
-                            repository.getTopRated(::requestCompletion)
+                            viewModel.loadNextPage()
                         }
                     }
                 }
@@ -78,29 +90,5 @@ class TopRatedFragment: Fragment() {
     private fun onSelectItem(movie: ResultDTO) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
         (activity as MainActivity).switchToMovieDetailsFragment(movie)
-    }
-
-    //! Callback. When top rated list request completes
-    private fun requestCompletion(result: RequestResult) {
-        when(result) {
-            is RequestResult.EmptyResultSuccess -> TODO()
-            is RequestResult.Error -> Toast.makeText(activity, result.e.toString(), Toast.LENGTH_LONG).show()
-            is RequestResult.ObjSuccess<*> -> {
-                val page = result.data as PageResultDTO<ResultDTO>
-
-                page?.let { page
-                    val items = page.results.toTypedArray()
-                    items?.let {
-                        table.apply {
-                            (adapter as TopRatedAdapter)?.let {
-                                it.dataSet += items
-                                it.notifyDataSetChanged()
-                            }
-                        }
-                    }
-                }
-                spinner.visibility = View.GONE
-            }
-        }
     }
 }

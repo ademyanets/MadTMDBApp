@@ -34,7 +34,7 @@ class MovieDetailsFragment: Fragment() {
     lateinit var companiesFlow: Flow
     lateinit var layout: ConstraintLayout
 
-    lateinit var repository: TmdbRepository
+    lateinit var repository: TmdbService
 
     val DEFAULT_ID: Int = 550
 
