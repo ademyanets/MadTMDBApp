@@ -30,7 +30,6 @@ class NetworkRepository(
             try {
                 val ret = makeGetTopRatedRequest(page)
                 resultHandler.post { cb(RequestResult.ObjSuccess(ret)) }
-
             } catch (e: Exception) {
                 Log.d("GGGG", "getTopRated exception", e)
                 resultHandler.post { cb(RequestResult.Error(e)) }

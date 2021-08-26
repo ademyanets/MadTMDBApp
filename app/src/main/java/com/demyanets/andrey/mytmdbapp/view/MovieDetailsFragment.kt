@@ -13,6 +13,7 @@ import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Constraints
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.demyanets.andrey.mytmdbapp.*
@@ -20,6 +21,8 @@ import com.demyanets.andrey.mytmdbapp.databinding.DetailsFragmentBinding
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
+import com.demyanets.andrey.mytmdbapp.viewmodel.MovieDetailsViewModel
+import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
 import java.io.BufferedReader
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.stream.Collectors
@@ -28,21 +31,13 @@ class MovieDetailsFragment: Fragment() {
 
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
-
-    lateinit var repository: TmdbService
-
-    val DEFAULT_ID: Int = 550
+    private val viewModel: MovieDetailsViewModel by viewModels()
+    private var DEFAULT_ID: Int = 550 //Fight Club
+    private var movieId: Int = DEFAULT_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val app: TmdbApplication = requireActivity().application as TmdbApplication//TODO: can throw!
-        val tp: ThreadPoolExecutor = app.threadPoolExecutor
-        val handler = Handler(Looper.getMainLooper())
-        repository = NetworkRepository(tp, handler)
-
-        val id = arguments?.getInt("id") ?: DEFAULT_ID
-        (repository as NetworkRepository).getMovie(id, ::requestCompletion)
+        movieId = arguments?.getInt("id") ?: DEFAULT_ID
     }
 
     override fun onCreateView(
@@ -54,22 +49,31 @@ class MovieDetailsFragment: Fragment() {
         return binding.root
     }
 
-    private fun requestCompletion(result: RequestResult) {
-        when(result) {
-            is RequestResult.EmptyResultSuccess -> TODO()
-            is RequestResult.Error -> Toast.makeText(activity, result.e.toString(), Toast.LENGTH_LONG).show()
-            is RequestResult.ObjSuccess<*> -> {
-                val movie = result.data as MovieDTO //TODO: FIXME:
-                binding.movieDetailsTitle.setText(movie.title)
-                binding.movieDetailsReview.setText("${movie.overview}\n\n${movie.homepage}")
-                binding.movieDetails.setText("${movie.genres[0].name}\nOverall: ${movie.vote_average}\n\nReleased ${movie.release_date}\n\nBudget ${movie.budget}$")
-                binding.movieDetailsImage.load("https://image.tmdb.org/t/p/original${movie.backdrop_path}") //FIXME: add /configuration request
-                addLogos(movie)
-
-                binding.movieDetailsSpinner.visibility = View.GONE
-                Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel?.let {
+            val app: TmdbApplication = requireActivity().application as TmdbApplication//TODO: can throw!
+            val tp: ThreadPoolExecutor = app.threadPoolExecutor
+            val handler = Handler(Looper.getMainLooper())
+            viewModel.setRepository(NetworkRepository(tp, handler))
+            viewModel.getMovie(movieId)
         }
+
+        viewModel.movie.observe(viewLifecycleOwner) { movie ->
+            binding.movieDetailsTitle.setText(movie.title)
+            binding.movieDetailsReview.setText("${movie.overview}\n\n${movie.homepage}")
+            binding.movieDetails.setText("${movie.genres[0].name}\nOverall: ${movie.vote_average}\n\nReleased ${movie.release_date}\n\nBudget ${movie.budget}$")
+            binding.movieDetailsImage.load("https://image.tmdb.org/t/p/original${movie.backdrop_path}") //FIXME: add /configuration request
+            addLogos(movie)
+
+            binding.movieDetailsSpinner.visibility = View.GONE
+            Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            Toast.makeText(activity, it.toString(), Toast.LENGTH_LONG).show()
+        }
+
     }
 
     //! Add logos programmatically via constraint layout flow helper

@@ -1,29 +1,24 @@
 package com.demyanets.andrey.mytmdbapp.viewmodel
 
-import android.os.Handler
-import android.os.Looper
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.demyanets.andrey.mytmdbapp.NetworkRepository
-import com.demyanets.andrey.mytmdbapp.TmdbApplication
+import com.demyanets.andrey.mytmdbapp.TmdbService
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
-import java.lang.Error
 import java.lang.Exception
-import java.util.concurrent.ThreadPoolExecutor
 
 class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
-    private val _items = MutableLiveData<Array<ResultDTO>>()//TODO: split it inti separate props like items stream and error stream
+    private val _items = MutableLiveData<Array<ResultDTO>>()
     val items: LiveData<Array<ResultDTO>> = _items
 
     private val _error = MutableLiveData<Exception>()
     val error: LiveData<Exception> = _error
 
-    private var _repo: NetworkRepository? = null
+    private var _repo: TmdbService? = null
     private var currentPage: Int = 0
     private var totalPages: Int = 0
     private var isLoading: Boolean = false
