@@ -2,6 +2,7 @@ package com.demyanets.andrey.mytmdbapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.fragment.app.commit
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.MovieDetailsFragment
 import com.demyanets.andrey.mytmdbapp.view.TopRatedFragment
@@ -12,10 +13,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragment_container, TopRatedFragment())
-                .commit()
+            supportFragmentManager.commit {
+                setCustomAnimations(
+                    R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out
+                )
+                replace(R.id.fragment_container, TopRatedFragment())
+            }
         }
     }
 
@@ -25,18 +28,12 @@ class MainActivity : AppCompatActivity() {
         args.putInt("id", movie.id) //TODO: try parcelable
         detailsFragment.arguments = args
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, detailsFragment)
-            .addToBackStack(null)
-            .commit()
-    }
-
-    fun switchToTopRatedFragment(){
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, TopRatedFragment())
-            .addToBackStack(null)
-            .commit()
+        supportFragmentManager.commit {
+            setCustomAnimations(
+                R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out
+            )
+            replace(R.id.fragment_container, detailsFragment)
+            addToBackStack(null)
+        }
     }
 }
