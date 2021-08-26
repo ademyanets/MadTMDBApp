@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.demyanets.andrey.mytmdbapp.*
+import com.demyanets.andrey.mytmdbapp.databinding.TopRatedFragmentBinding
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
@@ -25,11 +26,7 @@ import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
 import java.util.concurrent.ThreadPoolExecutor
 
 class TopRatedFragment: Fragment() {
-
-    lateinit var table: RecyclerView
-    lateinit var spinner: ProgressBar
-    lateinit var refresh: SwipeRefreshLayout
-
+    private lateinit var binding: TopRatedFragmentBinding
     private val viewModel: TopRatedViewModel by viewModels()
 
     override fun onCreateView(
@@ -37,36 +34,33 @@ class TopRatedFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.top_rated_fragment, container, false)
+        binding = TopRatedFragmentBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        refresh = view.findViewById<SwipeRefreshLayout>(R.id.swipe_container)
-        spinner = view.findViewById<ProgressBar>(R.id.top_rated_spinner)
-        table = view.findViewById<RecyclerView>(R.id.recycler_view)
 
         setupControls()
         bindViewmodel()
     }
 
     private fun setupControls() {
-        spinner.visibility = View.VISIBLE
+        binding.topRatedSpinner.visibility = View.VISIBLE
 
-        refresh.setOnRefreshListener {
-            (table.adapter as TopRatedAdapter)?.let {
+        binding.swipeContainer.setOnRefreshListener {
+            (binding.recyclerView.adapter as TopRatedAdapter)?.let {
                 Toast.makeText(activity, "Refreshing page...", Toast.LENGTH_SHORT).show()
-                spinner.visibility = View.VISIBLE
+                binding.topRatedSpinner.visibility = View.VISIBLE
                 it.dataSet = emptyArray()
                 it.notifyDataSetChanged()
                 viewModel.loadFirstPage()
-                refresh.isRefreshing = false
+                binding.swipeContainer.isRefreshing = false
             }
         }
 
         TopRatedAdapter.Companion.itemOnClick = ::onSelectItem
-        table.apply {
+        binding.recyclerView.apply {
             adapter = TopRatedAdapter(emptyArray())
             layoutManager = LinearLayoutManager(activity)
             addOnScrollListener(object : OnScrollListener() {
@@ -75,7 +69,7 @@ class TopRatedFragment: Fragment() {
                     adapter?.let {
                         if ((layoutManager as LinearLayoutManager).findLastVisibleItemPosition() == it.itemCount - 1) {
                             Toast.makeText(activity, "Loading page...", Toast.LENGTH_SHORT).show()
-                            spinner.visibility = View.VISIBLE
+                            binding.topRatedSpinner.visibility = View.VISIBLE
                             viewModel.loadNextPage()
                         }
                     }
@@ -93,11 +87,11 @@ class TopRatedFragment: Fragment() {
         }
 
         viewModel.items.observe(viewLifecycleOwner) {
-            table.apply {
+            binding.recyclerView.apply {
                 (adapter as TopRatedAdapter)?.let { topRatedAdapter ->
                     topRatedAdapter.dataSet += it
                     topRatedAdapter.notifyDataSetChanged()
-                    spinner.visibility = View.GONE
+                    binding.topRatedSpinner.visibility = View.GONE
                 }
             }
         }
