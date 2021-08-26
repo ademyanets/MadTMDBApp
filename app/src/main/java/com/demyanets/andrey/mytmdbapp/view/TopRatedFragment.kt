@@ -26,7 +26,8 @@ import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
 import java.util.concurrent.ThreadPoolExecutor
 
 class TopRatedFragment: Fragment() {
-    private lateinit var binding: TopRatedFragmentBinding
+    private var _binding: TopRatedFragmentBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: TopRatedViewModel by viewModels()
 
     override fun onCreateView(
@@ -34,7 +35,7 @@ class TopRatedFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = TopRatedFragmentBinding.inflate(inflater)
+        _binding = TopRatedFragmentBinding.inflate(inflater)
         return binding.root
     }
 
@@ -105,5 +106,10 @@ class TopRatedFragment: Fragment() {
     private fun onSelectItem(movie: ResultDTO) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
         (activity as MainActivity).switchToMovieDetailsFragment(movie)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
