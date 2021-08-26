@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
@@ -27,9 +28,10 @@ class TopRatedFragment: Fragment() {
 
     lateinit var table: RecyclerView
     lateinit var spinner: ProgressBar
+    lateinit var refresh: SwipeRefreshLayout
 
     private val viewModel: TopRatedViewModel by viewModels()
-    
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,33 +43,29 @@ class TopRatedFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        refresh = view.findViewById<SwipeRefreshLayout>(R.id.swipe_container)
         spinner = view.findViewById<ProgressBar>(R.id.top_rated_spinner)
+        table = view.findViewById<RecyclerView>(R.id.recycler_view)
+
+        setupControls()
+        bindViewmodel()
+    }
+
+    private fun setupControls() {
         spinner.visibility = View.VISIBLE
 
-        table = view.findViewById<RecyclerView>(R.id.recycler_view)
-        TopRatedAdapter.Companion.itemOnClick = ::onSelectItem
-
-        val app: TmdbApplication = requireActivity().application as TmdbApplication //FIXME:
-        app?.let {
-            val tp: ThreadPoolExecutor = app.threadPoolExecutor
-            val handler = Handler(Looper.getMainLooper())
-            viewModel.setRepository(NetworkRepository(tp, handler))
-        }
-
-        viewModel.items.observe(viewLifecycleOwner) {
-            table.apply {
-                (adapter as TopRatedAdapter)?.let { topRatedAdapter ->
-                    topRatedAdapter.dataSet += it
-                    topRatedAdapter.notifyDataSetChanged()
-                    spinner.visibility = View.GONE
-                }
+        refresh.setOnRefreshListener {
+            (table.adapter as TopRatedAdapter)?.let {
+                Toast.makeText(activity, "Refreshing page...", Toast.LENGTH_SHORT).show()
+                spinner.visibility = View.VISIBLE
+                it.dataSet = emptyArray()
+                it.notifyDataSetChanged()
+                viewModel.loadFirstPage()
+                refresh.isRefreshing = false
             }
         }
 
-        viewModel.error.observe(viewLifecycleOwner) {
-            Toast.makeText(activity, "Request error ${it}", Toast.LENGTH_LONG).show()
-        }
-
+        TopRatedAdapter.Companion.itemOnClick = ::onSelectItem
         table.apply {
             adapter = TopRatedAdapter(emptyArray())
             layoutManager = LinearLayoutManager(activity)
@@ -83,6 +81,29 @@ class TopRatedFragment: Fragment() {
                     }
                 }
             })
+        }
+    }
+
+    private fun bindViewmodel() {
+        val app: TmdbApplication = requireActivity().application as TmdbApplication //FIXME:
+        app?.let {
+            val tp: ThreadPoolExecutor = app.threadPoolExecutor
+            val handler = Handler(Looper.getMainLooper())
+            viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
+        }
+
+        viewModel.items.observe(viewLifecycleOwner) {
+            table.apply {
+                (adapter as TopRatedAdapter)?.let { topRatedAdapter ->
+                    topRatedAdapter.dataSet += it
+                    topRatedAdapter.notifyDataSetChanged()
+                    spinner.visibility = View.GONE
+                }
+            }
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            Toast.makeText(activity, "Request error ${it}", Toast.LENGTH_LONG).show()
         }
     }
 

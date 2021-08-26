@@ -28,8 +28,12 @@ class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
     private var totalPages: Int = 0
     private var isLoading: Boolean = false
 
-    fun setRepository(repo: NetworkRepository) {
+    fun setRepositoryAndLoadFirstPage(repo: NetworkRepository) {
         _repo = repo
+        loadPage(0)
+    }
+
+    fun loadFirstPage() {
         loadPage(0)
     }
 
