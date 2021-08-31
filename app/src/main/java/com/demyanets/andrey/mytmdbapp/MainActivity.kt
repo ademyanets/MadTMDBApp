@@ -2,6 +2,9 @@ package com.demyanets.andrey.mytmdbapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.fragment.app.commit
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.MovieDetailsFragment
@@ -20,6 +23,18 @@ class MainActivity : AppCompatActivity() {
                 replace(R.id.fragment_container, TopRatedFragment())
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.default_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_search) {
+            Log.d("GGGG", "TODO: perform search")
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     fun switchToMovieDetailsFragment(movie: ResultDTO) {
