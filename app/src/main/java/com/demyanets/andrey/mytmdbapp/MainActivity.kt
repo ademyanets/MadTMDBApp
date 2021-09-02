@@ -21,10 +21,9 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                setCustomAnimations(
-                    R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out
-                )
-                replace(R.id.fragment_container, TopRatedFragment())
+                replace(R.id.fragment_container_1, ListingCarouselFragment())//TODO: pass id into fragment
+                replace(R.id.fragment_container_2, ListingCarouselFragment())
+                replace(R.id.fragment_container_3, ListingCarouselFragment())
             }
         }
 
@@ -77,6 +76,21 @@ Log.d("GGG", "GGG ${intent}")
             Log.d("GGGG", "TODO: perform search")
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun switchToMovieDetailsFragment(movie: ResultDTO) {
+        val detailsFragment: MovieDetailsFragment = MovieDetailsFragment()
+        val args = Bundle()
+        args.putInt("id", movie.id) //TODO: try parcelable
+        detailsFragment.arguments = args
+
+        supportFragmentManager.commit {
+            setCustomAnimations(
+                R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out
+            )
+            replace(R.id.fragment_container, detailsFragment)
+            addToBackStack(null)
+        }
     }
 
     fun switchToMovieDetailsFragment(movie: ResultDTO) {
