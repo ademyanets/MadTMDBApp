@@ -16,23 +16,22 @@ import com.demyanets.andrey.mytmdbapp.databinding.TopRatedFragmentBinding
 import com.demyanets.andrey.mytmdbapp.model.Genre
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.CarouselFragment
+import com.demyanets.andrey.mytmdbapp.view.GenreItemsCarouselFragment
+import com.demyanets.andrey.mytmdbapp.view.TopRatedCarouselFragment
 import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
 
 //TODO: extract into sealed class whatever..
-const val GenreAction: Int = 28
-const val GenreDocumentary: Int = 99
-const val GenreTvShows: Int = 10770
-const val GenreKey: String = "genre-id"
-const val MovieKey: String = "movie-id"
+
 
 interface ListingRouter {
     fun openDetails(movie: ResultDTO)
     fun openListing(genre: Genre)
+    fun openTopRatedListing()
 }
 
-fun CarouselFragment.setGenre(genre: Genre): CarouselFragment {
+fun GenreItemsCarouselFragment.setGenre(genre: Genre): CarouselFragment {
     val actionsArgs = Bundle()
-    actionsArgs.putParcelable(GenreKey, genre)
+    actionsArgs.putParcelable(Genre.GenreKey, genre)
     arguments = actionsArgs
     return this
 }
@@ -49,15 +48,14 @@ class MainActivity : AppCompatActivity(), ListingRouter {
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
+                val topRatedCarousel = TopRatedCarouselFragment()
+                replace(binding.fragmentContainer1.id, topRatedCarousel)
 
-                val actionsCarousel = CarouselFragment().setGenre(Genre(GenreAction, "Action"))
-                replace(binding.fragmentContainer1.id, actionsCarousel)
+                val actionsCarousel = GenreItemsCarouselFragment().setGenre(Genre(Genre.GenreAction, "Action"))
+                replace(binding.fragmentContainer2.id, actionsCarousel)
 
-                val documentaryCarousel = CarouselFragment().setGenre(Genre(GenreDocumentary, "Documentary"))
-                replace(binding.fragmentContainer2.id, documentaryCarousel)
-
-                val seriesCarousel = CarouselFragment().setGenre(Genre(GenreTvShows, "Tv shows"))
-                replace(binding.fragmentContainer3.id, seriesCarousel)
+                val documentaryCarousel = GenreItemsCarouselFragment().setGenre(Genre(Genre.GenreDocumentary, "Documentary"))
+                replace(binding.fragmentContainer3.id, documentaryCarousel)
             }
         }
 
@@ -94,16 +92,20 @@ class MainActivity : AppCompatActivity(), ListingRouter {
 
     override fun openDetails(movie: ResultDTO) {
         val intent = Intent(this, OtherActivity::class.java).apply {
-            putExtra(MovieKey, movie.id)
+            putExtra(Genre.MovieKey, movie.id)
         }
         startActivity(intent)
     }
 
     override fun openListing(genre: Genre) {
         val intent = Intent(this, OtherActivity::class.java).apply {
-            putExtra(GenreKey, genre)
+            putExtra(Genre.GenreKey, genre)
         }
         startActivity(intent)
+    }
+
+    override fun openTopRatedListing() {
+        TODO("Not yet implemented")
     }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {

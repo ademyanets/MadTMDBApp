@@ -22,6 +22,13 @@ class Genre(
     }
 
     companion object CREATOR : Parcelable.Creator<Genre> {
+        const val GenreKey: String = "genre-id"
+        const val MovieKey: String = "movie-id"
+
+        const val GenreAction: Int = 28
+        const val GenreDocumentary: Int = 99
+        const val GenreTvShows: Int = 10770
+
         override fun createFromParcel(parcel: Parcel): Genre {
             return Genre(parcel)
         }
@@ -30,4 +37,6 @@ class Genre(
             return arrayOfNulls(size)
         }
     }
+
+
 }
