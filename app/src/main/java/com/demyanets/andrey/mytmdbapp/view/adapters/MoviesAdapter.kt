@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.demyanets.andrey.mytmdbapp.R
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 
-class TopRatedAdapter(var dataSet: Array<ResultDTO>) :
-    RecyclerView.Adapter<TopRatedAdapter.ViewHolder>() {
+class MoviesAdapter(var dataSet: Array<ResultDTO>) :
+    RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
     /**
      * Provide a reference to the type of views that you are using

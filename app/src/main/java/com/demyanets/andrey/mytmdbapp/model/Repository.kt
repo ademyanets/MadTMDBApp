@@ -18,6 +18,7 @@ import javax.net.ssl.HttpsURLConnection
 interface TmdbService {
     fun getTopRated(page: Int, cb: (res: RequestResult) -> Unit ): Unit
     fun getMovie(id: Int, cb: (res: RequestResult) -> Unit): Unit
+    fun getGenreItems(genre: Int, page: Int, cb: (res: RequestResult) -> Unit): Unit
 }
 
 class NetworkRepository(
@@ -49,6 +50,18 @@ class NetworkRepository(
         }
     }
 
+    override fun getGenreItems(genre: Int, page: Int, cb: (res: RequestResult) -> Unit) {
+        executor.execute {
+            try {
+                val ret = makeGetGenreItemsRequest(genre, page)
+                resultHandler.post { cb(RequestResult.ObjSuccess(ret)) }
+            } catch (e: Exception) {
+                Log.d("GGGG", "getGenreItems ${genre} exception", e)
+                resultHandler.post { cb(RequestResult.Error(e)) }
+            }
+        }
+    }
+
     private fun makeGetMovieRequest(id: Int): MovieDTO {
         val url =
             URL("https://api.themoviedb.org/3/movie/$id?api_key=5a6625fd71210561e22960146bc39db9")
@@ -65,6 +78,21 @@ class NetworkRepository(
     private fun makeGetTopRatedRequest(page: Int): PageResultDTO<ResultDTO> {
         val url =
             URL("https://api.themoviedb.org/3/movie/top_rated?api_key=5a6625fd71210561e22960146bc39db9&page=${page}")
+        var conn: HttpsURLConnection = url.openConnection() as HttpsURLConnection
+        conn.requestMethod = "GET"
+        conn.connectTimeout = 3000
+
+        //https://code.luasoftware.com/tutorials/android/gson-fromjson-list/
+        val data = BufferedReader(InputStreamReader(conn.inputStream)).text()
+        val type = object: TypeToken<PageResultDTO<ResultDTO>>() {}.type
+        val page = Gson().fromJson<PageResultDTO<ResultDTO>>(data, type)
+
+        return page
+    }
+
+    private fun makeGetGenreItemsRequest(gid: Int, page: Int): PageResultDTO<ResultDTO> {
+        val url =
+            URL("https://api.themoviedb.org/3/discover/movie?with_genres=${gid}&page=${page}&api_key=5a6625fd71210561e22960146bc39db9")
         var conn: HttpsURLConnection = url.openConnection() as HttpsURLConnection
         conn.requestMethod = "GET"
         conn.connectTimeout = 3000

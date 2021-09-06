@@ -6,7 +6,6 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
-//TOOD: где хранить threadExecutor и как передавать?
 class TmdbApplication: Application() {
     private val NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors()
     private val workQueue: BlockingQueue<Runnable> = LinkedBlockingQueue<Runnable>()

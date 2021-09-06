@@ -13,23 +13,30 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.demyanets.andrey.mytmdbapp.*
-import com.demyanets.andrey.mytmdbapp.databinding.TopRatedFragmentBinding
+import com.demyanets.andrey.mytmdbapp.databinding.ListingFragmentBinding
+import com.demyanets.andrey.mytmdbapp.model.Genre
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
-import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
+import com.demyanets.andrey.mytmdbapp.viewmodel.GenreListingViewModel
 import java.util.concurrent.ThreadPoolExecutor
 
-class TopRatedFragment: Fragment() {
-    private var _binding: TopRatedFragmentBinding? = null
+class ListingFragment: Fragment() {
+    private var _binding: ListingFragmentBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: TopRatedViewModel by viewModels()
+    private val viewModel: GenreListingViewModel by viewModels()
+    private var genre: Genre? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        genre = arguments?.getParcelable(GenreKey)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = TopRatedFragmentBinding.inflate(inflater)
+        _binding = ListingFragmentBinding.inflate(inflater)
         return binding.root
     }
 
@@ -78,7 +85,9 @@ class TopRatedFragment: Fragment() {
         app?.let {
             val tp: ThreadPoolExecutor = app.threadPoolExecutor
             val handler = Handler(Looper.getMainLooper())
-            viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
+            genre?.let {
+                viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler), it.id)
+            }
         }
 
         viewModel.items.observe(viewLifecycleOwner) {
