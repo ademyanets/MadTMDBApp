@@ -5,9 +5,12 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.demyanets.andrey.mytmdbapp.ListingRouter
 import com.demyanets.andrey.mytmdbapp.NetworkRepository
 import com.demyanets.andrey.mytmdbapp.R
@@ -19,6 +22,10 @@ import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
 import java.lang.Exception
 import java.util.concurrent.ThreadPoolExecutor
 
+fun Fragment.stringResource(id: Int): String {
+    return resources.getString(id)
+}
+
 class TopRatedCarouselFragment: CarouselFragment() {
     private val refreshModel: MainViewModel by activityViewModels()
     private val viewModel: TopRatedViewModel by viewModels()
@@ -29,7 +36,8 @@ class TopRatedCarouselFragment: CarouselFragment() {
     }
 
     private fun bindViewModel() {
-        binding.itemTitle.text = resources.getString(R.string.top_rated)
+        binding.itemTitle.text = stringResource(R.string.top_rated)
+        binding.topRatedSpinner.visibility = View.VISIBLE
 
         refreshModel.reloadFlag.observe(viewLifecycleOwner) {
             viewModel.loadFirstPage()
@@ -37,31 +45,29 @@ class TopRatedCarouselFragment: CarouselFragment() {
             binding.errorPanel.visibility = View.GONE
         }
 
-        (activity?.application as TmdbApplication).let {
-            val tp: ThreadPoolExecutor = it.threadPoolExecutor
-            val handler = Handler(Looper.getMainLooper())
-            viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
+//        (activity?.application as TmdbApplication).let {
+//            val tp: ThreadPoolExecutor = it.threadPoolExecutor
+//            val handler = Handler(Looper.getMainLooper())
+//            viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
+//        }
+        viewModel.loadFirstPage()
+
+        viewModel.items.observe(viewLifecycleOwner) {
+            onReceiveData(it)
+        }
+        viewModel.error.observe(viewLifecycleOwner) {
+            onReceiveError(it)
         }
 
+        MoviesAdapter.itemOnClick = ::onSelectItem
+        binding.recyclerView.apply {
+            adapter = MoviesAdapter(emptyArray())
+            layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        }
 
-        binding.topRatedSpinner.visibility = View.VISIBLE
-            viewModel.items.observe(viewLifecycleOwner) {
-                onReceiveData(it)
-            }
-            viewModel.error.observe(viewLifecycleOwner) {
-                onReceiveError(it)
-            }
-
-            MoviesAdapter.itemOnClick = ::onSelectItem
-            binding.recyclerView.apply {
-                adapter = MoviesAdapter(emptyArray())
-                layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-            }
-
-            binding.itemMore.setOnClickListener {
-                moreButtonClick()
-            }
-
+        binding.itemMore.setOnClickListener {
+            moreButtonClick()
+        }
     }
 
     //! Callback. When user selects a movie from list
@@ -76,26 +82,24 @@ class TopRatedCarouselFragment: CarouselFragment() {
     }
 
     private fun onReceiveData(items: Array<ResultDTO>) {
+        binding.topRatedSpinner.visibility = View.GONE
         binding.errorPanel.visibility = View.GONE
         binding.itemMore.visibility = View.VISIBLE
-        binding.recyclerView.apply {
-            (adapter as MoviesAdapter).let { carouselAdapter ->
-                carouselAdapter.dataSet += items
-                carouselAdapter.notifyDataSetChanged()
-                binding.topRatedSpinner.visibility = View.GONE
-            }
-        }
+        setTableData(items)
     }
 
     private fun onReceiveError(ex: Exception) {
         binding.topRatedSpinner.visibility = View.GONE
         binding.errorPanel.visibility = View.VISIBLE
         binding.itemMore.visibility = View.GONE
+        setTableData(emptyArray(), false)
         Toast.makeText(activity, ex.toString(), Toast.LENGTH_SHORT).show()
+    }
 
+    private fun setTableData(items: Array<ResultDTO>, increment: Boolean = true) {
         binding.recyclerView.apply {
             (adapter as MoviesAdapter).let { carouselAdapter ->
-                carouselAdapter.dataSet = emptyArray()
+                carouselAdapter.dataSet = if (increment) carouselAdapter.dataSet + items else items
                 carouselAdapter.notifyDataSetChanged()
             }
         }

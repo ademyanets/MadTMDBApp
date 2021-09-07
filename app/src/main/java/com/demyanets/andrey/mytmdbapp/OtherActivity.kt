@@ -24,8 +24,8 @@ class OtherActivity: AppCompatActivity() {
                     R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out
                 )
 
-                val movieId: Int = intent.getIntExtra(Genre.MovieKey, -1)
-                val genreId: Int = intent.getIntExtra(Genre.GenreKey, -1)
+                val movieId: Int = intent.getIntExtra(Common.MovieKey, -1)
+                val genreId: Int = intent.getIntExtra(Common.GenreKey, -1)
 
                 if (movieId != -1) {
                     val detailsFragment: MovieDetailsFragment = MovieDetailsFragment()

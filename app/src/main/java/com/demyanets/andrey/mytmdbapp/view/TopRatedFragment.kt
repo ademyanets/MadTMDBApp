@@ -75,11 +75,12 @@ class TopRatedFragment: Fragment() {
 
     private fun bindViewmodel() {
         val app: TmdbApplication = requireActivity().application as TmdbApplication //FIXME:
-        app?.let {
-            val tp: ThreadPoolExecutor = app.threadPoolExecutor
-            val handler = Handler(Looper.getMainLooper())
-            viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
-        }
+//        app?.let {
+//            val tp: ThreadPoolExecutor = app.threadPoolExecutor
+//            val handler = Handler(Looper.getMainLooper())
+//            viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
+//        }
+        viewModel.loadFirstPage()
 
         viewModel.items.observe(viewLifecycleOwner) {
             binding.recyclerView.apply {

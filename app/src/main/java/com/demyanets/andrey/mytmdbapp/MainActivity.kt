@@ -31,7 +31,7 @@ interface ListingRouter {
 
 fun GenreItemsCarouselFragment.setGenre(genre: Genre): CarouselFragment {
     val actionsArgs = Bundle()
-    actionsArgs.putParcelable(Genre.GenreKey, genre)
+    actionsArgs.putParcelable(Common.GenreKey, genre)
     arguments = actionsArgs
     return this
 }
@@ -92,21 +92,21 @@ class MainActivity : AppCompatActivity(), ListingRouter {
 
     override fun openDetails(movie: ResultDTO) {
         val intent = Intent(this, OtherActivity::class.java).apply {
-            putExtra(Genre.MovieKey, movie.id)
+            putExtra(Common.MovieKey, movie.id)
         }
         startActivity(intent)
     }
 
     override fun openListing(genre: Genre) {
         val intent = Intent(this, OtherActivity::class.java).apply {
-            putExtra(Genre.GenreKey, genre)
+            putExtra(Common.GenreKey, genre)
         }
         startActivity(intent)
     }
 
     override fun openTopRatedListing() {
         val intent = Intent(this, OtherActivity::class.java).apply {
-            putExtra(Genre.TopRatedKey, true)
+            putExtra(Common.TopRatedKey, true)
         }
         startActivity(intent)
     }

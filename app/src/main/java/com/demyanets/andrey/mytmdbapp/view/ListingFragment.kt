@@ -28,7 +28,7 @@ class ListingFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        genre = arguments?.getParcelable(Genre.GenreKey)
+        genre = arguments?.getParcelable(Common.GenreKey)
     }
 
     override fun onCreateView(

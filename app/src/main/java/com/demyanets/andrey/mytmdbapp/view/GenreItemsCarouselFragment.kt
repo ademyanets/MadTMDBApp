@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.demyanets.andrey.mytmdbapp.Common
 import com.demyanets.andrey.mytmdbapp.ListingRouter
 import com.demyanets.andrey.mytmdbapp.NetworkRepository
 import com.demyanets.andrey.mytmdbapp.TmdbApplication
@@ -26,7 +27,7 @@ class GenreItemsCarouselFragment: CarouselFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        genre = arguments?.getParcelable(Genre.GenreKey)
+        genre = arguments?.getParcelable(Common.GenreKey)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -22,9 +22,6 @@ class Genre(
     }
 
     companion object CREATOR : Parcelable.Creator<Genre> {
-        const val GenreKey: String = "genre-id"//FIXME:
-        const val MovieKey: String = "movie-id"//FIXME:
-        const val TopRatedKey: String = "top-rated"//FIXME:
 
         const val GenreAction: Int = 28
         const val GenreDocumentary: Int = 99

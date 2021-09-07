@@ -14,13 +14,17 @@ import java.io.InputStreamReader
 import java.net.URL
 import java.util.concurrent.Executor
 import javax.net.ssl.HttpsURLConnection
+import retrofit2.http.GET
 
+
+//! DEPRECEATED
 interface TmdbService {
     fun getTopRated(page: Int, cb: (res: RequestResult) -> Unit ): Unit
     fun getMovie(id: Int, cb: (res: RequestResult) -> Unit): Unit
     fun getGenreItems(genre: Int, page: Int, cb: (res: RequestResult) -> Unit): Unit
 }
 
+//! DEPRECEATED
 class NetworkRepository(
         private val executor: Executor,
         private val resultHandler: Handler
