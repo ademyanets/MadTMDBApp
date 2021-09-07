@@ -105,7 +105,10 @@ class MainActivity : AppCompatActivity(), ListingRouter {
     }
 
     override fun openTopRatedListing() {
-        TODO("Not yet implemented")
+        val intent = Intent(this, OtherActivity::class.java).apply {
+            putExtra(Genre.TopRatedKey, true)
+        }
+        startActivity(intent)
     }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -45,7 +45,7 @@ class TopRatedFragment: Fragment() {
 
         binding.swipeContainer.setOnRefreshListener {
             (binding.recyclerView.adapter as MoviesAdapter)?.let {
-                Toast.makeText(activity, "Refreshing page...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, R.string.refresh_hint, Toast.LENGTH_SHORT).show()
                 binding.topRatedSpinner.visibility = View.VISIBLE
                 it.dataSet = emptyArray()
                 it.notifyDataSetChanged()
@@ -63,7 +63,7 @@ class TopRatedFragment: Fragment() {
                     super.onScrolled(recyclerView, dx, dy)
                     adapter?.let {
                         if ((layoutManager as LinearLayoutManager).findLastVisibleItemPosition() == it.itemCount - 1) {
-                            Toast.makeText(activity, "Loading page...", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(activity, R.string.load_hint, Toast.LENGTH_SHORT).show()
                             binding.topRatedSpinner.visibility = View.VISIBLE
                             viewModel.loadNextPage()
                         }
@@ -92,7 +92,7 @@ class TopRatedFragment: Fragment() {
         }
 
         viewModel.error.observe(viewLifecycleOwner) {
-            Toast.makeText(activity, "Request error ${it}", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, it.toString(), Toast.LENGTH_LONG).show()
         }
     }
 

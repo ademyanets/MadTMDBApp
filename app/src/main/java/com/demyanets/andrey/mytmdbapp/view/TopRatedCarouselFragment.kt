@@ -10,8 +10,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.demyanets.andrey.mytmdbapp.ListingRouter
 import com.demyanets.andrey.mytmdbapp.NetworkRepository
+import com.demyanets.andrey.mytmdbapp.R
 import com.demyanets.andrey.mytmdbapp.TmdbApplication
-import com.demyanets.andrey.mytmdbapp.model.Genre
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
@@ -29,7 +29,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
     }
 
     private fun bindViewModel() {
-        binding.itemTitle.text = "Top Rated"
+        binding.itemTitle.text = resources.getString(R.string.top_rated)
 
         refreshModel.reloadFlag.observe(viewLifecycleOwner) {
             viewModel.loadFirstPage()
@@ -37,7 +37,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
             binding.errorPanel.visibility = View.GONE
         }
 
-        (activity?.application as TmdbApplication)?.let {
+        (activity?.application as TmdbApplication).let {
             val tp: ThreadPoolExecutor = it.threadPoolExecutor
             val handler = Handler(Looper.getMainLooper())
             viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
@@ -52,7 +52,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
                 onReceiveError(it)
             }
 
-            MoviesAdapter.Companion.itemOnClick = ::onSelectItem
+            MoviesAdapter.itemOnClick = ::onSelectItem
             binding.recyclerView.apply {
                 adapter = MoviesAdapter(emptyArray())
                 layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
@@ -71,7 +71,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
     }
 
     private fun moreButtonClick() {
-        Toast.makeText(activity, "Go to Top Rated List", Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, R.string.top_rated_hint, Toast.LENGTH_LONG).show()
         (activity as ListingRouter).openTopRatedListing()
     }
 
@@ -79,7 +79,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
         binding.errorPanel.visibility = View.GONE
         binding.itemMore.visibility = View.VISIBLE
         binding.recyclerView.apply {
-            (adapter as MoviesAdapter)?.let { carouselAdapter ->
+            (adapter as MoviesAdapter).let { carouselAdapter ->
                 carouselAdapter.dataSet += items
                 carouselAdapter.notifyDataSetChanged()
                 binding.topRatedSpinner.visibility = View.GONE
@@ -91,10 +91,10 @@ class TopRatedCarouselFragment: CarouselFragment() {
         binding.topRatedSpinner.visibility = View.GONE
         binding.errorPanel.visibility = View.VISIBLE
         binding.itemMore.visibility = View.GONE
-        Toast.makeText(activity, "Error ${ex}", Toast.LENGTH_SHORT)
+        Toast.makeText(activity, ex.toString(), Toast.LENGTH_SHORT).show()
 
         binding.recyclerView.apply {
-            (adapter as MoviesAdapter)?.let { carouselAdapter ->
+            (adapter as MoviesAdapter).let { carouselAdapter ->
                 carouselAdapter.dataSet = emptyArray()
                 carouselAdapter.notifyDataSetChanged()
             }

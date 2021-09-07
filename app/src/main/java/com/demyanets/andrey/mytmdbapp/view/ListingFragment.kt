@@ -52,7 +52,7 @@ class ListingFragment: Fragment() {
 
         binding.swipeContainer.setOnRefreshListener {
             (binding.recyclerView.adapter as MoviesAdapter)?.let {
-                Toast.makeText(activity, "Refreshing page...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, R.string.refresh_hint, Toast.LENGTH_SHORT).show()
                 binding.topRatedSpinner.visibility = View.VISIBLE
                 it.dataSet = emptyArray()
                 it.notifyDataSetChanged()
@@ -70,7 +70,7 @@ class ListingFragment: Fragment() {
                     super.onScrolled(recyclerView, dx, dy)
                     adapter?.let {
                         if ((layoutManager as LinearLayoutManager).findLastVisibleItemPosition() == it.itemCount - 1) {
-                            Toast.makeText(activity, "Loading page...", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(activity, R.string.load_hint, Toast.LENGTH_SHORT).show()
                             binding.topRatedSpinner.visibility = View.VISIBLE
                             viewModel.loadNextPage()
                         }
@@ -101,14 +101,14 @@ class ListingFragment: Fragment() {
         }
 
         viewModel.error.observe(viewLifecycleOwner) {
-            Toast.makeText(activity, "Request error ${it}", Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, it.toString(), Toast.LENGTH_LONG).show()
         }
     }
 
     //! Callback. When user selects a movie from list
     private fun onSelectItem(movie: ResultDTO) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
-        //(activity as MainActivity).switchToMovieDetailsFragment(movie)
+        (activity as MainActivity).openDetails(movie)
     }
 
     override fun onDestroyView() {

@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">My TMDB App</string>
     <string name="movie_backstep_image">movie backstep image</string>
+    <string name="top_rated_hint">Go to Top Rated List</string>
+    <string name="refresh_hint">Refreshing data...</string>
+    <string name="load_hint">Loading data...</string>
+    <string name="error_emoji">🤦‍</string>
+    <string name="error_default">Oops, something went wrong...</string>
+    <string name="more">MORE!</string>
+    <string name="top_rated">Top Rated</string>
 </resources>

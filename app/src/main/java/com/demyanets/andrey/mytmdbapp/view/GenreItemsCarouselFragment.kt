@@ -99,7 +99,7 @@ class GenreItemsCarouselFragment: CarouselFragment() {
         binding.topRatedSpinner.visibility = View.GONE
         binding.errorPanel.visibility = View.VISIBLE
         binding.itemMore.visibility = View.GONE
-        Toast.makeText(activity, "Error ${ex}", Toast.LENGTH_SHORT)
+        Toast.makeText(activity, ex.toString(), Toast.LENGTH_SHORT)
 
         binding.recyclerView.apply {
             (adapter as MoviesAdapter)?.let { carouselAdapter ->
