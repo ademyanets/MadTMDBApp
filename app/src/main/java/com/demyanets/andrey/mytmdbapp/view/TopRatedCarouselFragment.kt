@@ -15,6 +15,7 @@ import com.demyanets.andrey.mytmdbapp.ListingRouter
 import com.demyanets.andrey.mytmdbapp.NetworkRepository
 import com.demyanets.andrey.mytmdbapp.R
 import com.demyanets.andrey.mytmdbapp.TmdbApplication
+import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
@@ -45,11 +46,6 @@ class TopRatedCarouselFragment: CarouselFragment() {
             binding.errorPanel.visibility = View.GONE
         }
 
-//        (activity?.application as TmdbApplication).let {
-//            val tp: ThreadPoolExecutor = it.threadPoolExecutor
-//            val handler = Handler(Looper.getMainLooper())
-//            viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
-//        }
         viewModel.loadFirstPage()
 
         viewModel.items.observe(viewLifecycleOwner) {
@@ -71,7 +67,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
     }
 
     //! Callback. When user selects a movie from list
-    private fun onSelectItem(movie: ResultDTO) {
+    private fun onSelectItem(movie: Movie) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
         (activity as ListingRouter).openDetails(movie)
     }
@@ -81,7 +77,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
         (activity as ListingRouter).openTopRatedListing()
     }
 
-    private fun onReceiveData(items: Array<ResultDTO>) {
+    private fun onReceiveData(items: Array<Movie>) {
         binding.topRatedSpinner.visibility = View.GONE
         binding.errorPanel.visibility = View.GONE
         binding.itemMore.visibility = View.VISIBLE
@@ -96,7 +92,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
         Toast.makeText(activity, ex.toString(), Toast.LENGTH_SHORT).show()
     }
 
-    private fun setTableData(items: Array<ResultDTO>, increment: Boolean = true) {
+    private fun setTableData(items: Array<Movie>, increment: Boolean = true) {
         binding.recyclerView.apply {
             (adapter as MoviesAdapter).let { carouselAdapter ->
                 carouselAdapter.dataSet = if (increment) carouselAdapter.dataSet + items else items

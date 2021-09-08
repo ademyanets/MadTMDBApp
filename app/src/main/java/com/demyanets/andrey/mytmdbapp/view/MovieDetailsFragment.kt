@@ -18,6 +18,8 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.databinding.DetailsFragmentBinding
+import com.demyanets.andrey.mytmdbapp.model.Movie
+import com.demyanets.andrey.mytmdbapp.model.MovieDetails
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
@@ -56,8 +58,8 @@ class MovieDetailsFragment: Fragment() {
         viewModel.movie.observe(viewLifecycleOwner) { movie ->
             binding.movieDetailsTitle.setText(movie.title)
             binding.movieDetailsReview.setText("${movie.overview}\n\n${movie.homepage}")
-            binding.movieDetails.setText("${movie.genres[0].name}\nOverall: ${movie.vote_average}\n\nReleased ${movie.release_date}\n\nBudget ${movie.budget}$")
-            binding.movieDetailsImage.load("https://image.tmdb.org/t/p/original${movie.backdrop_path}") //FIXME: add /configuration request
+            binding.movieDetails.setText("${movie.genres[0].name}\nOverall: ${movie.voteAverage}\n\nReleased ${movie.releaseDate}")
+            binding.movieDetailsImage.load(Common.posterOriginalWidthUrl(movie.backdropPath)) //FIXME: add /configuration request
             addLogos(movie)
 
             binding.movieDetailsSpinner.visibility = View.GONE
@@ -71,13 +73,13 @@ class MovieDetailsFragment: Fragment() {
     }
 
     //! Add logos programmatically via constraint layout flow helper
-    private fun addLogos(movie: MovieDTO) {
+    private fun addLogos(movie: MovieDetails) {
         if (binding.flow.referencedIds.count() != 0) {
             return
         }
 
         var ids: Array<Int> = emptyArray()
-        movie.production_companies.forEachIndexed { index, comp ->
+        movie.productionCompanies.forEachIndexed { index, comp ->
             var logo = ImageView(activity)
             logo.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, 150)
             logo.load("https://image.tmdb.org/t/p/w500${comp.logo_path}")

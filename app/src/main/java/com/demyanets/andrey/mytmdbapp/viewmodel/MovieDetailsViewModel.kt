@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.demyanets.andrey.mytmdbapp.R
 import com.demyanets.andrey.mytmdbapp.TmdbService
+import com.demyanets.andrey.mytmdbapp.model.MovieDetails
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
+import com.demyanets.andrey.mytmdbapp.model.dto.convertToEntity
 import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
 import com.demyanets.andrey.mytmdbapp.repository.TmdbDatasource
 import retrofit2.Call
@@ -17,8 +20,8 @@ import java.lang.Exception
 
 class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
 
-    private val _movie = MutableLiveData<MovieDTO>()
-    val movie: LiveData<MovieDTO> = _movie
+    private val _movie = MutableLiveData<MovieDetails>()
+    val movie: LiveData<MovieDetails> = _movie
 
     private val _error = MutableLiveData<Exception>()
     val error: LiveData<Exception> = _error
@@ -36,7 +39,13 @@ class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
             }
             override fun onResponse(call: Call<MovieDTO>, response: Response<MovieDTO>) {
                 response.body()?.let {
-                    _movie.value = it
+                    val value: MovieDetails? = it.convertToEntity()
+                    if (value != null) {
+                        _movie.value = value!!
+                    } else {
+                        Log.d("GGG", "MovieDetails convertion error")
+                        _error.value = Exception("MovieDetails convertion error")
+                    }
                 }
             }
         })

@@ -1,5 +1,8 @@
 package com.demyanets.andrey.mytmdbapp.model.dto
 
+import com.demyanets.andrey.mytmdbapp.model.Movie
+import java.lang.reflect.Constructor
+
 data class ResultDTO(
     val adult: Boolean,
     val backdrop_path: String,
@@ -16,3 +19,7 @@ data class ResultDTO(
     val vote_average: Double,
     val vote_count: Int
 )
+
+fun ResultDTO.convert(): Movie? {
+    return Movie(id, title, overview, vote_average)
+}

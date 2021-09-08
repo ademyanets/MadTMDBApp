@@ -6,9 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.demyanets.andrey.mytmdbapp.R
+import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 
-class MoviesAdapter(var dataSet: Array<ResultDTO>) :
+class MoviesAdapter(var dataSet: Array<Movie>) :
     RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
     /**
@@ -33,7 +34,7 @@ class MoviesAdapter(var dataSet: Array<ResultDTO>) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val movie = dataSet[position]
         viewHolder.titleView.text = movie.title
-        viewHolder.categoryView.text = movie.vote_average.toString()
+        viewHolder.categoryView.text = movie.voteAverage.toString()
         viewHolder.textView.text = movie.overview
         viewHolder.itemView.setOnClickListener {
             itemOnClick?.let { it1 -> it1(movie) }
@@ -44,6 +45,6 @@ class MoviesAdapter(var dataSet: Array<ResultDTO>) :
     override fun getItemCount() = dataSet.size
 
     companion object {
-        var itemOnClick: ((movie: ResultDTO) -> Unit)? = null
+        var itemOnClick: ((movie: Movie) -> Unit)? = null
     }
 }

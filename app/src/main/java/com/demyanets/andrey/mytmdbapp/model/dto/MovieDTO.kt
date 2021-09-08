@@ -1,6 +1,7 @@
 package com.demyanets.andrey.mytmdbapp.model.dto
 
 import com.demyanets.andrey.mytmdbapp.ProductionCountryDTO
+import com.demyanets.andrey.mytmdbapp.model.MovieDetails
 
 data class MovieDTO(
     val adult: Boolean,
@@ -29,3 +30,7 @@ data class MovieDTO(
     val vote_average: Double,
     val vote_count: Int
 )
+
+fun MovieDTO.convertToEntity(): MovieDetails? {
+    return MovieDetails(id, title, overview, genres, vote_average, production_companies, release_date, backdrop_path, homepage )
+}

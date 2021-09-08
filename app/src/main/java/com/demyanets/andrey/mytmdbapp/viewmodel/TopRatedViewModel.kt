@@ -8,9 +8,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.demyanets.andrey.mytmdbapp.NetworkRepository
 import com.demyanets.andrey.mytmdbapp.TmdbService
+import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
+import com.demyanets.andrey.mytmdbapp.model.dto.convert
 import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
 import com.demyanets.andrey.mytmdbapp.repository.TmdbDatasource
 import retrofit2.Call
@@ -19,8 +21,8 @@ import retrofit2.Response
 import java.lang.Exception
 
 class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
-    private val _items = MutableLiveData<Array<ResultDTO>>()
-    val items: LiveData<Array<ResultDTO>> = _items
+    private val _items = MutableLiveData<Array<Movie>>()
+    val items: LiveData<Array<Movie>> = _items
 
     private val _error = MutableLiveData<Exception>()
     val error: LiveData<Exception> = _error
@@ -63,7 +65,7 @@ class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
                 response.body()?.let {
                     totalPages = it.total_pages
                     it.results.toTypedArray()?.let {
-                        _items.value = it
+                        _items.value = it.map{ it.convert() }.filterNotNull().toTypedArray()
                     }
                 }
                 isLoading = false

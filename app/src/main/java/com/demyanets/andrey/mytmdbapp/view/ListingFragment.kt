@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.databinding.ListingFragmentBinding
 import com.demyanets.andrey.mytmdbapp.model.Genre
+import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.GenreListingViewModel
@@ -98,7 +99,7 @@ class ListingFragment: Fragment() {
     }
 
     //! Callback. When user selects a movie from list
-    private fun onSelectItem(movie: ResultDTO) {
+    private fun onSelectItem(movie: Movie) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
         (activity as MainActivity).openDetails(movie)
     }

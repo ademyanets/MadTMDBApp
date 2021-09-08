@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.demyanets.andrey.mytmdbapp.Common
 import com.demyanets.andrey.mytmdbapp.ListingRouter
 import com.demyanets.andrey.mytmdbapp.model.Genre
+import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.GenreListingViewModel
@@ -62,7 +63,7 @@ class GenreItemsCarouselFragment: CarouselFragment() {
     }
 
     //! Callback. When user selects a movie from list
-    private fun onSelectItem(movie: ResultDTO) {
+    private fun onSelectItem(movie: Movie) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
         (activity as ListingRouter).openDetails(movie)
     }
@@ -72,7 +73,7 @@ class GenreItemsCarouselFragment: CarouselFragment() {
         (activity as ListingRouter).openListing(genre)
     }
 
-    private fun onReceiveData(items: Array<ResultDTO>) {
+    private fun onReceiveData(items: Array<Movie>) {
         binding.errorPanel.visibility = View.GONE
         binding.itemMore.visibility = View.VISIBLE
         binding.topRatedSpinner.visibility = View.GONE

@@ -5,8 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
+import com.demyanets.andrey.mytmdbapp.model.dto.convert
 import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
 import com.demyanets.andrey.mytmdbapp.repository.TmdbDatasource
 import retrofit2.Call
@@ -15,8 +17,8 @@ import retrofit2.Response
 import java.lang.Exception
 
 class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
-    private val _items = MutableLiveData<Array<ResultDTO>>()
-    val items: LiveData<Array<ResultDTO>> = _items
+    private val _items = MutableLiveData<Array<Movie>>()
+    val items: LiveData<Array<Movie>> = _items
 
     private val _error = MutableLiveData<Exception>()
     val error: LiveData<Exception> = _error
@@ -69,8 +71,8 @@ class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
                 response.body()?.let {
                     totalPages = it.total_pages
                     _items.value = emptyArray()
-                    it.results.toTypedArray().let { it ->
-                        _items.value = it
+                    it.results.toTypedArray().let { dtoItems ->
+                        _items.value = dtoItems.map { it.convert() }.filterNotNull().toTypedArray()
                     }
                 }
                 isLoading = false

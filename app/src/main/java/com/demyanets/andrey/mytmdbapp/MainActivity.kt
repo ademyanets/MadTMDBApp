@@ -14,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.demyanets.andrey.mytmdbapp.databinding.ActivityMainBinding
 import com.demyanets.andrey.mytmdbapp.databinding.TopRatedFragmentBinding
 import com.demyanets.andrey.mytmdbapp.model.Genre
+import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.CarouselFragment
 import com.demyanets.andrey.mytmdbapp.view.GenreItemsCarouselFragment
@@ -24,7 +25,7 @@ import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
 
 
 interface ListingRouter {
-    fun openDetails(movie: ResultDTO)
+    fun openDetails(movie: Movie)
     fun openListing(genre: Genre)
     fun openTopRatedListing()
 }
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity(), ListingRouter {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun openDetails(movie: ResultDTO) {
+    override fun openDetails(movie: Movie) {
         val intent = Intent(this, OtherActivity::class.java).apply {
             putExtra(Common.MovieKey, movie.id)
         }
