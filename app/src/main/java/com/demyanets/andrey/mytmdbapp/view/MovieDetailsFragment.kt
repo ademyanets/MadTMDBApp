@@ -51,14 +51,8 @@ class MovieDetailsFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel?.let {
-            val app: TmdbApplication = requireActivity().application as TmdbApplication//TODO: can throw!
-            val tp: ThreadPoolExecutor = app.threadPoolExecutor
-            val handler = Handler(Looper.getMainLooper())
-            viewModel.setRepository(NetworkRepository(tp, handler))
-            viewModel.getMovie(movieId)
-        }
 
+        viewModel.getMovie(movieId)
         viewModel.movie.observe(viewLifecycleOwner) { movie ->
             binding.movieDetailsTitle.setText(movie.title)
             binding.movieDetailsReview.setText("${movie.overview}\n\n${movie.homepage}")

@@ -74,14 +74,7 @@ class TopRatedFragment: Fragment() {
     }
 
     private fun bindViewmodel() {
-        val app: TmdbApplication = requireActivity().application as TmdbApplication //FIXME:
-//        app?.let {
-//            val tp: ThreadPoolExecutor = app.threadPoolExecutor
-//            val handler = Handler(Looper.getMainLooper())
-//            viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler))
-//        }
         viewModel.loadFirstPage()
-
         viewModel.items.observe(viewLifecycleOwner) {
             binding.recyclerView.apply {
                 (adapter as MoviesAdapter)?.let { topRatedAdapter ->
@@ -100,7 +93,7 @@ class TopRatedFragment: Fragment() {
     //! Callback. When user selects a movie from list
     private fun onSelectItem(movie: ResultDTO) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
-        //(activity as MainActivity).switchToMovieDetailsFragment(movie)
+        (activity as MainActivity).openDetails(movie)
     }
 
     override fun onDestroyView() {

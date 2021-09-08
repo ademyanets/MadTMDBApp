@@ -16,15 +16,9 @@ class MoviesAdapter(var dataSet: Array<ResultDTO>) :
      * (custom ViewHolder).
      */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleView: TextView
-        val categoryView: TextView
-        val textView: TextView
-
-        init {
-            titleView = view.findViewById(R.id.item_title)
-            categoryView = view.findViewById(R.id.item_category)
-            textView = view.findViewById(R.id.item_text)
-        }
+        val titleView: TextView = view.findViewById(R.id.item_title)
+        val categoryView: TextView = view.findViewById(R.id.item_category)
+        val textView: TextView = view.findViewById(R.id.item_text)
     }
 
     // Create new views (invoked by the layout manager)
@@ -42,7 +36,7 @@ class MoviesAdapter(var dataSet: Array<ResultDTO>) :
         viewHolder.categoryView.text = movie.vote_average.toString()
         viewHolder.textView.text = movie.overview
         viewHolder.itemView.setOnClickListener {
-            Companion.itemOnClick?.let { it1 -> it1(movie) }
+            itemOnClick?.let { it1 -> it1(movie) }
         }
     }
 

@@ -25,7 +25,7 @@ class OtherActivity: AppCompatActivity() {
                 )
 
                 val movieId: Int = intent.getIntExtra(Common.MovieKey, -1)
-                val genreId: Int = intent.getIntExtra(Common.GenreKey, -1)
+
 
                 if (movieId != -1) {
                     val detailsFragment: MovieDetailsFragment = MovieDetailsFragment()
@@ -33,14 +33,17 @@ class OtherActivity: AppCompatActivity() {
                     args.putInt("id", movieId) //TODO: try parcelable
                     detailsFragment.arguments = args
                     replace(R.id.fragment_container, detailsFragment)
-                } else if (genreId != -1) {
-                    val listingFragment = ListingFragment()
-                    val args = Bundle()
-                    args.putInt("id", genreId) //TODO: try parcelable
-                    listingFragment.arguments = args
-                    replace(R.id.fragment_container, listingFragment)
                 } else {
-                    replace(R.id.fragment_container, TopRatedFragment())
+                    val genre: Genre? = intent.getParcelableExtra<Genre>(Common.GenreKey)
+                    if (genre != null) {
+                        val listingFragment = ListingFragment()
+                        val args = Bundle()
+                        args.putParcelable(Common.GenreKey, genre)
+                        listingFragment.arguments = args
+                        replace(R.id.fragment_container, listingFragment)
+                    } else {
+                        replace(R.id.fragment_container, TopRatedFragment())
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.demyanets.andrey.mytmdbapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -7,6 +8,11 @@ import androidx.lifecycle.ViewModel
 import com.demyanets.andrey.mytmdbapp.TmdbService
 import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
+import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
+import com.demyanets.andrey.mytmdbapp.repository.TmdbDatasource
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.lang.Exception
 
 class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
@@ -19,20 +25,20 @@ class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
 
     private var repository: TmdbService? = null
 
-    fun setRepository(repo: TmdbService) {//FIXME: DI
-        repository = repo
-    }
-
     fun getMovie(id: Int) {
-        repository?.getMovie(id) {
-            when(it) {
-                is RequestResult.Error -> _error.value = it.e
-                is RequestResult.ObjSuccess<*> -> {
-                    (it.data as MovieDTO)?.let { data ->
-                        _movie.value = data
-                    }
+        val client = RetrofitClient.getClient()
+        val ds = client.create(TmdbDatasource::class.java)
+
+        ds.getMoviewDetails(id).enqueue( object : Callback<MovieDTO> {
+            override fun onFailure(call: Call<MovieDTO>, t: Throwable) {
+                Log.d("GGG", t.toString())
+                _error.value = Exception(t.localizedMessage)
+            }
+            override fun onResponse(call: Call<MovieDTO>, response: Response<MovieDTO>) {
+                response.body()?.let {
+                    _movie.value = it
                 }
             }
-        }
+        })
     }
 }

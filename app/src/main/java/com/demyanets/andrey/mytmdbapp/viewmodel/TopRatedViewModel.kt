@@ -1,6 +1,7 @@
 package com.demyanets.andrey.mytmdbapp.viewmodel
 
 import android.net.DnsResolver
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -24,15 +25,9 @@ class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
     private val _error = MutableLiveData<Exception>()
     val error: LiveData<Exception> = _error
 
-    private var _repo: TmdbService? = null
     private var currentPage: Int = 0
     private var totalPages: Int = 0
     private var isLoading: Boolean = false
-
-//    fun setRepositoryAndLoadFirstPage(repo: NetworkRepository) {
-//        _repo = repo
-//        loadPage(0)
-//    }
 
     fun loadFirstPage() {
         loadPage(0)
@@ -56,7 +51,8 @@ class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
 
         ds.getTopRatedList().enqueue(object : Callback<PageResultDTO<ResultDTO>> {
             override fun onFailure(call: Call<PageResultDTO<ResultDTO>>, t: Throwable) {
-                _error.value = Exception(t.localizedMessage)//FIXME:
+                Log.d("GGG", t.toString())
+                _error.value = Exception(t.localizedMessage)
                 isLoading = false
             }
 
@@ -74,25 +70,4 @@ class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
             }
         })
     }
-
-//        _repo?.getTopRated(page + 1) {//FIXME: api counts pages starting from 1, not from 0.
-//            when (it) {
-//                is RequestResult.EmptyResultSuccess -> TODO()
-//                is RequestResult.Error -> {
-//                    _error.value = it.e
-//                }
-//                is RequestResult.ObjSuccess<*> -> {
-//                    val page = it.data as PageResultDTO<ResultDTO>
-//                    page?.let {
-//                        page
-//                        totalPages = page.total_pages
-//                        val items = page.results.toTypedArray()
-//                        items?.let {
-//                            items
-//                            _items.value = items
-//                        }
-//                    }
-//                }
-//            }
-//            isLoading = false
 }

@@ -1,8 +1,6 @@
 package com.demyanets.andrey.mytmdbapp.view
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +16,6 @@ import com.demyanets.andrey.mytmdbapp.model.Genre
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.GenreListingViewModel
-import java.util.concurrent.ThreadPoolExecutor
 
 class ListingFragment: Fragment() {
     private var _binding: ListingFragmentBinding? = null
@@ -35,7 +32,7 @@ class ListingFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = ListingFragmentBinding.inflate(inflater)
         return binding.root
     }
@@ -51,7 +48,7 @@ class ListingFragment: Fragment() {
         binding.topRatedSpinner.visibility = View.VISIBLE
 
         binding.swipeContainer.setOnRefreshListener {
-            (binding.recyclerView.adapter as MoviesAdapter)?.let {
+            (binding.recyclerView.adapter as MoviesAdapter).let {
                 Toast.makeText(activity, R.string.refresh_hint, Toast.LENGTH_SHORT).show()
                 binding.topRatedSpinner.visibility = View.VISIBLE
                 it.dataSet = emptyArray()
@@ -81,13 +78,8 @@ class ListingFragment: Fragment() {
     }
 
     private fun bindViewmodel() {
-        val app: TmdbApplication = requireActivity().application as TmdbApplication //FIXME:
-        app?.let {
-            val tp: ThreadPoolExecutor = app.threadPoolExecutor
-            val handler = Handler(Looper.getMainLooper())
-            genre?.let {
-                viewModel.setRepositoryAndLoadFirstPage(NetworkRepository(tp, handler), it.id)
-            }
+        genre?.let {
+            viewModel.setGenreAndLoad(it.id)
         }
 
         viewModel.items.observe(viewLifecycleOwner) {
