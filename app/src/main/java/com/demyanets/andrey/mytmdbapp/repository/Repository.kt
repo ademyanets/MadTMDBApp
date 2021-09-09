@@ -2,7 +2,7 @@ package com.demyanets.andrey.mytmdbapp
 
 import android.os.Handler
 import android.util.Log
-import com.demyanets.andrey.mytmdbapp.model.RequestResult
+import com.demyanets.andrey.mytmdbapp.model.RequestStatus
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
@@ -14,14 +14,13 @@ import java.io.InputStreamReader
 import java.net.URL
 import java.util.concurrent.Executor
 import javax.net.ssl.HttpsURLConnection
-import retrofit2.http.GET
 
 
 //! DEPRECEATED
 interface TmdbService {
-    fun getTopRated(page: Int, cb: (res: RequestResult) -> Unit ): Unit
-    fun getMovie(id: Int, cb: (res: RequestResult) -> Unit): Unit
-    fun getGenreItems(genre: Int, page: Int, cb: (res: RequestResult) -> Unit): Unit
+    fun getTopRated(page: Int, cb: (res: RequestStatus) -> Unit ): Unit
+    fun getMovie(id: Int, cb: (res: RequestStatus) -> Unit): Unit
+    fun getGenreItems(genre: Int, page: Int, cb: (res: RequestStatus) -> Unit): Unit
 }
 
 //! DEPRECEATED
@@ -30,38 +29,38 @@ class NetworkRepository(
         private val resultHandler: Handler
     ): TmdbService {
 
-    override fun getTopRated(page: Int, cb: (res: RequestResult) -> Unit) {
+    override fun getTopRated(page: Int, cb: (res: RequestStatus) -> Unit) {
         executor.execute {
             try {
                 val ret = makeGetTopRatedRequest(page)
-                resultHandler.post { cb(RequestResult.ObjSuccess(ret)) }
+                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
             } catch (e: Exception) {
                 Log.d("GGGG", "getTopRated exception", e)
-                resultHandler.post { cb(RequestResult.Error(e)) }
+                resultHandler.post { cb(RequestStatus.Error(e)) }
             }
         }
     }
 
-    override fun getMovie(id: Int, cb: (res: RequestResult) -> Unit): Unit {
+    override fun getMovie(id: Int, cb: (res: RequestStatus) -> Unit): Unit {
         executor.execute {
             try {
                 val ret = makeGetMovieRequest(id)
-                resultHandler.post { cb(RequestResult.ObjSuccess(ret)) }
+                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
             } catch (e: Exception) {
                 Log.d("GGGG", "getMovie exception", e)
-                resultHandler.post { cb(RequestResult.Error(e)) }
+                resultHandler.post { cb(RequestStatus.Error(e)) }
             }
         }
     }
 
-    override fun getGenreItems(genre: Int, page: Int, cb: (res: RequestResult) -> Unit) {
+    override fun getGenreItems(genre: Int, page: Int, cb: (res: RequestStatus) -> Unit) {
         executor.execute {
             try {
                 val ret = makeGetGenreItemsRequest(genre, page)
-                resultHandler.post { cb(RequestResult.ObjSuccess(ret)) }
+                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
             } catch (e: Exception) {
                 Log.d("GGGG", "getGenreItems ${genre} exception", e)
-                resultHandler.post { cb(RequestResult.Error(e)) }
+                resultHandler.post { cb(RequestStatus.Error(e)) }
             }
         }
     }

@@ -1,7 +1,5 @@
 package com.demyanets.andrey.mytmdbapp.view
 
-import android.app.ActionBar
-import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,24 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.Constraints
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import coil.load
-import coil.transform.CircleCropTransformation
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.databinding.DetailsFragmentBinding
-import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.MovieDetails
-import com.demyanets.andrey.mytmdbapp.model.RequestResult
-import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
-import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
+import com.demyanets.andrey.mytmdbapp.model.RequestStatus
 import com.demyanets.andrey.mytmdbapp.viewmodel.MovieDetailsViewModel
-import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
 import java.io.BufferedReader
-import java.util.concurrent.ThreadPoolExecutor
+import java.lang.Exception
 import java.util.stream.Collectors
 
 class MovieDetailsFragment: Fragment() {
@@ -46,7 +37,7 @@ class MovieDetailsFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = DetailsFragmentBinding.inflate(inflater)
         return binding.root
     }
@@ -55,21 +46,30 @@ class MovieDetailsFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.getMovie(movieId)
-        viewModel.movie.observe(viewLifecycleOwner) { movie ->
-            binding.movieDetailsTitle.setText(movie.title)
-            binding.movieDetailsReview.setText("${movie.overview}\n\n${movie.homepage}")
-            binding.movieDetails.setText("${movie.genres[0].name}\nOverall: ${movie.voteAverage}\n\nReleased ${movie.releaseDate}")
-            binding.movieDetailsImage.load(Common.posterOriginalWidthUrl(movie.backdropPath)) //FIXME: add /configuration request
-            addLogos(movie)
-
-            binding.movieDetailsSpinner.visibility = View.GONE
-            Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
+        viewModel.data.observe(viewLifecycleOwner) { status ->
+            when(status) {
+                is RequestStatus.Error -> { exc: Exception ->
+                    Toast.makeText(activity, exc.toString(), Toast.LENGTH_LONG).show()
+                }
+                is RequestStatus.Loading -> Log.d("GGG", "TODO: add loaders")
+                is RequestStatus.ObjSuccess<*> -> { status
+                    ((status as RequestStatus.ObjSuccess<MovieDetails>)?.data).let { movie ->
+                        setText(movie)
+                        addLogos(movie)
+                        binding.movieDetailsSpinner.visibility = View.GONE
+                        Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
         }
+    }
 
-        viewModel.error.observe(viewLifecycleOwner) {
-            Toast.makeText(activity, it.toString(), Toast.LENGTH_LONG).show()
-        }
+    private fun setText(movie: MovieDetails) {
+        binding.movieDetailsTitle.text = movie.title
+        binding.movieDetailsReview.text = "${movie.overview}\n\n${movie.homepage}"
+        binding.movieDetails.text = "${movie.genres[0].name}\nOverall: ${movie.voteAverage}\n\nReleased ${movie.releaseDate}"
 
+        binding.movieDetailsImage.load(Common.posterOriginalWidthUrl(movie.backdropPath)) //FIXME: add /configuration request
     }
 
     //! Add logos programmatically via constraint layout flow helper

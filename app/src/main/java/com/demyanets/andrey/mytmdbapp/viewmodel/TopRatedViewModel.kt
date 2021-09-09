@@ -1,15 +1,11 @@
 package com.demyanets.andrey.mytmdbapp.viewmodel
 
-import android.net.DnsResolver
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.demyanets.andrey.mytmdbapp.NetworkRepository
-import com.demyanets.andrey.mytmdbapp.TmdbService
 import com.demyanets.andrey.mytmdbapp.model.Movie
-import com.demyanets.andrey.mytmdbapp.model.RequestResult
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.convert
