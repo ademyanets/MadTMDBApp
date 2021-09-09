@@ -53,7 +53,7 @@ class MovieDetailsFragment: Fragment() {
                 }
                 is RequestStatus.Loading -> Log.d("GGG", "TODO: add loaders")
                 is RequestStatus.ObjSuccess<*> -> { status
-                    ((status as RequestStatus.ObjSuccess<MovieDetails>)?.data).let { movie ->
+                    (status.data as MovieDetails)?.let { movie ->
                         setText(movie)
                         addLogos(movie)
                         binding.movieDetailsSpinner.visibility = View.GONE

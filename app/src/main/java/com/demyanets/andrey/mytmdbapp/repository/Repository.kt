@@ -33,7 +33,7 @@ class NetworkRepository(
         executor.execute {
             try {
                 val ret = makeGetTopRatedRequest(page)
-                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
+//                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
             } catch (e: Exception) {
                 Log.d("GGGG", "getTopRated exception", e)
                 resultHandler.post { cb(RequestStatus.Error(e)) }
@@ -45,7 +45,7 @@ class NetworkRepository(
         executor.execute {
             try {
                 val ret = makeGetMovieRequest(id)
-                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
+//                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
             } catch (e: Exception) {
                 Log.d("GGGG", "getMovie exception", e)
                 resultHandler.post { cb(RequestStatus.Error(e)) }
@@ -57,7 +57,7 @@ class NetworkRepository(
         executor.execute {
             try {
                 val ret = makeGetGenreItemsRequest(genre, page)
-                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
+//                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
             } catch (e: Exception) {
                 Log.d("GGGG", "getGenreItems ${genre} exception", e)
                 resultHandler.post { cb(RequestStatus.Error(e)) }

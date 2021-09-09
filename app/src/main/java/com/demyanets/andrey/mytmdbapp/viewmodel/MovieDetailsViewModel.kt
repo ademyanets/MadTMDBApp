@@ -2,7 +2,6 @@ package com.demyanets.andrey.mytmdbapp.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*
-import androidx.lifecycle.Transformations.map
 import com.demyanets.andrey.mytmdbapp.model.MovieDetails
 import com.demyanets.andrey.mytmdbapp.model.RequestStatus
 import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO

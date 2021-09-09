@@ -54,7 +54,7 @@ class ListingFragment: Fragment() {
                 binding.topRatedSpinner.visibility = View.VISIBLE
                 it.dataSet = emptyArray()
                 it.notifyDataSetChanged()
-                viewModel.loadFirstPage()
+                viewModel.loadFirstPage(genre!!.id)//FIXME:
                 binding.swipeContainer.isRefreshing = false
             }
         }
@@ -70,7 +70,7 @@ class ListingFragment: Fragment() {
                         if ((layoutManager as LinearLayoutManager).findLastVisibleItemPosition() == it.itemCount - 1) {
                             Toast.makeText(activity, R.string.load_hint, Toast.LENGTH_SHORT).show()
                             binding.topRatedSpinner.visibility = View.VISIBLE
-                            viewModel.loadNextPage()
+                            viewModel.loadNextPage(genre!!.id)//FIXME:
                         }
                     }
                 }
@@ -83,19 +83,19 @@ class ListingFragment: Fragment() {
             viewModel.setGenreAndLoad(it.id)
         }
 
-        viewModel.items.observe(viewLifecycleOwner) {
-            binding.recyclerView.apply {
-                (adapter as MoviesAdapter)?.let { topRatedAdapter ->
-                    topRatedAdapter.dataSet += it
-                    topRatedAdapter.notifyDataSetChanged()
-                    binding.topRatedSpinner.visibility = View.GONE
-                }
-            }
-        }
-
-        viewModel.error.observe(viewLifecycleOwner) {
-            Toast.makeText(activity, it.toString(), Toast.LENGTH_LONG).show()
-        }
+//        viewModel.items.observe(viewLifecycleOwner) {
+//            binding.recyclerView.apply {
+//                (adapter as MoviesAdapter)?.let { topRatedAdapter ->
+//                    topRatedAdapter.dataSet += it
+//                    topRatedAdapter.notifyDataSetChanged()
+//                    binding.topRatedSpinner.visibility = View.GONE
+//                }
+//            }
+//        }
+//
+//        viewModel.error.observe(viewLifecycleOwner) {
+//            Toast.makeText(activity, it.toString(), Toast.LENGTH_LONG).show()
+//        }
     }
 
     //! Callback. When user selects a movie from list

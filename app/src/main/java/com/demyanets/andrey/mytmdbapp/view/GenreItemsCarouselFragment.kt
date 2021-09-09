@@ -10,6 +10,7 @@ import com.demyanets.andrey.mytmdbapp.Common
 import com.demyanets.andrey.mytmdbapp.ListingRouter
 import com.demyanets.andrey.mytmdbapp.model.Genre
 import com.demyanets.andrey.mytmdbapp.model.Movie
+import com.demyanets.andrey.mytmdbapp.model.RequestStatus
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.GenreListingViewModel
@@ -32,25 +33,31 @@ class GenreItemsCarouselFragment: CarouselFragment() {
     }
 
     private fun bindViewModel() {
-        binding.itemTitle.text = genre?.name
-
-        refreshModel.reloadFlag.observe(viewLifecycleOwner) {
-            viewModel.loadFirstPage()
-            binding.topRatedSpinner.visibility = View.VISIBLE
-            binding.errorPanel.visibility = View.GONE
-        }
-
         genre?.let { genre ->
-            viewModel.setGenreAndLoad(genre.id)
-            binding.topRatedSpinner.visibility = View.VISIBLE
-            viewModel.items.observe(viewLifecycleOwner) {
-                onReceiveData(it)
+            binding.itemTitle.text = genre.name
+
+            refreshModel.reloadFlag.observe(viewLifecycleOwner) {
+                viewModel.loadFirstPage(genre.id)
             }
-            viewModel.error.observe(viewLifecycleOwner) {
-                onReceiveError(it)
+
+            viewModel.setGenreAndLoad(genre.id)
+            viewModel.data.observe(viewLifecycleOwner) {
+                when(it) {
+                    is RequestStatus.Error -> onReceiveError(it.e)
+                    is RequestStatus.Loading -> {
+                        binding.topRatedSpinner.visibility = View.VISIBLE
+                        binding.errorPanel.visibility = View.GONE
+                    }
+                    is RequestStatus.ObjSuccess<*> -> {
+                        (it.data as Array<Movie>)?.let {
+                            onReceiveData(it)
+                        }
+                    }
+                }
             }
 
             MoviesAdapter.Companion.itemOnClick = ::onSelectItem
+
             binding.recyclerView.apply {
                 adapter = MoviesAdapter(emptyArray())
                 layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
