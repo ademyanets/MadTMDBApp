@@ -52,8 +52,8 @@ class MovieDetailsFragment: Fragment() {
                     Toast.makeText(activity, exc.toString(), Toast.LENGTH_LONG).show()
                 }
                 is RequestStatus.Loading -> Log.d("GGG", "TODO: add loaders")
-                is RequestStatus.ObjSuccess<*> -> { status
-                    (status.data as MovieDetails)?.let { movie ->
+                is RequestStatus.ObjSuccess -> { status
+                    (status.data as? MovieDetails)?.let { movie ->
                         setText(movie)
                         addLogos(movie)
                         binding.movieDetailsSpinner.visibility = View.GONE

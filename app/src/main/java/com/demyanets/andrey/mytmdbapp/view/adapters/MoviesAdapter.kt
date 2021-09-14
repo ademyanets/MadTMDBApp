@@ -9,7 +9,7 @@ import com.demyanets.andrey.mytmdbapp.R
 import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 
-class MoviesAdapter(var dataSet: Array<Movie>) :
+class MoviesAdapter(var dataSet: List<Movie>) :
     RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
     /**

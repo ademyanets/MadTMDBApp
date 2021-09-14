@@ -16,7 +16,8 @@ import java.util.concurrent.Executor
 import javax.net.ssl.HttpsURLConnection
 
 
-//! DEPRECEATED
+////! DEPRECEATED
+/*
 interface TmdbService {
     fun getTopRated(page: Int, cb: (res: RequestStatus) -> Unit ): Unit
     fun getMovie(id: Int, cb: (res: RequestStatus) -> Unit): Unit
@@ -33,7 +34,7 @@ class NetworkRepository(
         executor.execute {
             try {
                 val ret = makeGetTopRatedRequest(page)
-//                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
+                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
             } catch (e: Exception) {
                 Log.d("GGGG", "getTopRated exception", e)
                 resultHandler.post { cb(RequestStatus.Error(e)) }
@@ -45,7 +46,7 @@ class NetworkRepository(
         executor.execute {
             try {
                 val ret = makeGetMovieRequest(id)
-//                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
+                resultHandler.post { cb(RequestStatus.ObjSuccess(ret)) }
             } catch (e: Exception) {
                 Log.d("GGGG", "getMovie exception", e)
                 resultHandler.post { cb(RequestStatus.Error(e)) }
@@ -108,3 +109,4 @@ class NetworkRepository(
         return page
     }
 }
+*/

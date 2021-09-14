@@ -18,8 +18,8 @@ class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
         const val SaveKey = "movie-details-id"
     }
 
-    private val _movie: MutableLiveData<RequestStatus> = MutableLiveData<RequestStatus>()
-    val data: LiveData<RequestStatus> = _movie
+    private val _movie = MutableLiveData<RequestStatus<MovieDetails>>()
+    val data: LiveData<RequestStatus<MovieDetails>> = _movie
 
     private var repo = RetrofitClient.getClient().create(TmdbDatasource::class.java)
 
@@ -31,7 +31,7 @@ class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
     }
 
     private fun doRequest(id: Int) {
-        _movie.value = RequestStatus.Loading()
+        _movie.value = RequestStatus.Loading
         repo.getMoviewDetails(id).enqueue( object : Callback<MovieDTO> {
             override fun onFailure(call: Call<MovieDTO>, t: Throwable) {
                 Log.d("GGG", t.toString())

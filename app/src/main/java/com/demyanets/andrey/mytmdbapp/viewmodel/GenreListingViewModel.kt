@@ -19,13 +19,13 @@ import java.lang.Exception
 
 class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
     companion object {
-        const val GenreKey = "genre-id"
-        const val CurrentPageKey = "current-id"
-        const val TotalPagesKey = "total-id"
+        const val GenreKey = "listing-genre-id"
+        const val CurrentPageKey = "listing-current"
+        const val TotalPagesKey = "listing-total"
     }
 
-    private val _data = MutableLiveData<RequestStatus>()//MutableLiveData<Array<Movie>>()
-    val data: LiveData<RequestStatus> = _data
+    private val _data = MutableLiveData<RequestStatus<List<Movie>>>()//MutableLiveData<Array<Movie>>()
+    val data: LiveData<RequestStatus<List<Movie>>> = _data
     private var currentPage: Int
         get() = state.get<Int>(CurrentPageKey) ?: 0
         set(value) { state[CurrentPageKey] = value }
@@ -37,9 +37,10 @@ class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
     private var repo = RetrofitClient.getClient().create(TmdbDatasource::class.java)
 
     fun setGenreAndLoad(genre: Int) {
-        if (!state.contains(GenreKey) || state.get<Int>(GenreKey) != genre)
-        loadFirstPage(genre)
-        state[GenreKey] = genre
+        if (!state.contains(GenreKey) || state.get<Int>(GenreKey) != genre) {
+            loadFirstPage(genre)
+            state[GenreKey] = genre
+        }
     }
 
     fun loadFirstPage(genre: Int) {
@@ -60,8 +61,7 @@ class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
             throw ExceptionInInitializerError()
         }
 
-        _data.value = RequestStatus.Loading()
-
+        _data.value = RequestStatus.Loading
         currentPage = page
         isLoading = true
 
@@ -78,11 +78,8 @@ class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
             ) {
                 response.body()?.let {
                     totalPages = it.total_pages
-                    _data.value = RequestStatus.ObjSuccess<Movie>(emptyArray())
-                    it.results.toTypedArray().let { dtoItems ->
-                        val items = dtoItems.map { it.convert() }.filterNotNull()
-                        _data.value = RequestStatus.ObjSuccess<Movie>(items)
-                    }
+                    val items = it.results.map { it.convert() }.filterNotNull()
+                    _data.value = RequestStatus.ObjSuccess(items)
                 }
                 isLoading = false
             }

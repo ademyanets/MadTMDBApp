@@ -44,14 +44,9 @@ class GenreItemsCarouselFragment: CarouselFragment() {
             viewModel.data.observe(viewLifecycleOwner) {
                 when(it) {
                     is RequestStatus.Error -> onReceiveError(it.e)
-                    is RequestStatus.Loading -> {
-                        binding.topRatedSpinner.visibility = View.VISIBLE
-                        binding.errorPanel.visibility = View.GONE
-                    }
-                    is RequestStatus.ObjSuccess<*> -> {
-                        (it.data as Array<Movie>)?.let {
-                            onReceiveData(it)
-                        }
+                    is RequestStatus.Loading -> setLoadingState()
+                    is RequestStatus.ObjSuccess<List<Movie>> -> {
+                        onReceiveData(it.data)
                     }
                 }
             }
@@ -59,7 +54,7 @@ class GenreItemsCarouselFragment: CarouselFragment() {
             MoviesAdapter.Companion.itemOnClick = ::onSelectItem
 
             binding.recyclerView.apply {
-                adapter = MoviesAdapter(emptyArray())
+                adapter = MoviesAdapter(emptyList())
                 layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
             }
 
@@ -80,30 +75,34 @@ class GenreItemsCarouselFragment: CarouselFragment() {
         (activity as ListingRouter).openListing(genre)
     }
 
-    private fun onReceiveData(items: Array<Movie>) {
+    private fun setLoadingState() {
+        binding.topRatedSpinner.visibility = View.VISIBLE
+        binding.errorPanel.visibility = View.GONE
+        binding.itemMore.visibility = View.GONE
+        setTableData(emptyList())
+    }
+
+    private fun onReceiveData(items: List<Movie>) {
         binding.errorPanel.visibility = View.GONE
         binding.itemMore.visibility = View.VISIBLE
         binding.topRatedSpinner.visibility = View.GONE
-
-        binding.recyclerView.apply {
-            (adapter as MoviesAdapter)?.let { carouselAdapter ->
-                carouselAdapter.dataSet += items
-                carouselAdapter.notifyDataSetChanged()
-            }
-        }
+        setTableData(items)
     }
 
     private fun onReceiveError(ex: Exception) {
         binding.topRatedSpinner.visibility = View.GONE
         binding.errorPanel.visibility = View.VISIBLE
         binding.itemMore.visibility = View.GONE
-
+        setTableData(emptyList(), false)
         Toast.makeText(activity, ex.toString(), Toast.LENGTH_SHORT).show()
+    }
 
+    private fun setTableData(items: List<Movie>, increment: Boolean = true) {
         binding.recyclerView.apply {
-            val mAdapter = adapter as MoviesAdapter
-            mAdapter.dataSet = emptyArray()
-            mAdapter.notifyDataSetChanged()
+            (adapter as MoviesAdapter).let { carouselAdapter ->
+                carouselAdapter.dataSet = if (increment) carouselAdapter.dataSet + items else items
+                carouselAdapter.notifyDataSetChanged()
+            }
         }
     }
 }

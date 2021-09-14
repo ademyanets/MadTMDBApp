@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.databinding.TopRatedFragmentBinding
 import com.demyanets.andrey.mytmdbapp.model.Movie
+import com.demyanets.andrey.mytmdbapp.model.RequestStatus
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
@@ -45,10 +46,10 @@ class TopRatedFragment: Fragment() {
         binding.topRatedSpinner.visibility = View.VISIBLE
 
         binding.swipeContainer.setOnRefreshListener {
-            (binding.recyclerView.adapter as MoviesAdapter)?.let {
+            (binding.recyclerView.adapter as? MoviesAdapter)?.let {
                 Toast.makeText(activity, R.string.refresh_hint, Toast.LENGTH_SHORT).show()
                 binding.topRatedSpinner.visibility = View.VISIBLE
-                it.dataSet = emptyArray()
+                it.dataSet = emptyList()
                 it.notifyDataSetChanged()
                 viewModel.loadFirstPage()
                 binding.swipeContainer.isRefreshing = false
@@ -57,7 +58,7 @@ class TopRatedFragment: Fragment() {
 
         MoviesAdapter.Companion.itemOnClick = ::onSelectItem
         binding.recyclerView.apply {
-            adapter = MoviesAdapter(emptyArray())
+            adapter = MoviesAdapter(emptyList())
             layoutManager = LinearLayoutManager(activity)
             addOnScrollListener(object : OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -77,17 +78,29 @@ class TopRatedFragment: Fragment() {
     private fun bindViewmodel() {
         viewModel.loadFirstPage()
         viewModel.items.observe(viewLifecycleOwner) {
-            binding.recyclerView.apply {
-                (adapter as MoviesAdapter)?.let { topRatedAdapter ->
-                    topRatedAdapter.dataSet += it
-                    topRatedAdapter.notifyDataSetChanged()
-                    binding.topRatedSpinner.visibility = View.GONE
-                }
+            when(it) {
+                is RequestStatus.Error -> onReceiveError(it.e)
+                is RequestStatus.Loading -> setLoadingState()
+                is RequestStatus.ObjSuccess -> onReceiveData(it.data)
             }
         }
+    }
 
-        viewModel.error.observe(viewLifecycleOwner) {
-            Toast.makeText(activity, it.toString(), Toast.LENGTH_LONG).show()
+    private fun onReceiveError(ex: Exception) {
+        Toast.makeText(activity, ex.toString(), Toast.LENGTH_LONG).show()
+    }
+
+    private fun setLoadingState() {
+        binding.topRatedSpinner.visibility = View.VISIBLE
+    }
+
+    private fun onReceiveData(items: List<Movie>) {
+        binding.recyclerView.apply {
+            (adapter as MoviesAdapter)?.let { topRatedAdapter ->
+                topRatedAdapter.dataSet += items
+                topRatedAdapter.notifyDataSetChanged()
+                binding.topRatedSpinner.visibility = View.GONE
+            }
         }
     }
 

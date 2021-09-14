@@ -1,31 +1,21 @@
 package com.demyanets.andrey.mytmdbapp.view
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.demyanets.andrey.mytmdbapp.ListingRouter
-import com.demyanets.andrey.mytmdbapp.NetworkRepository
 import com.demyanets.andrey.mytmdbapp.R
-import com.demyanets.andrey.mytmdbapp.TmdbApplication
 import com.demyanets.andrey.mytmdbapp.model.Movie
-import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
+import com.demyanets.andrey.mytmdbapp.model.RequestStatus
+import com.demyanets.andrey.mytmdbapp.utils.stringResource
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
 import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
 import java.lang.Exception
-import java.util.concurrent.ThreadPoolExecutor
-
-fun Fragment.stringResource(id: Int): String {
-    return resources.getString(id)
-}
 
 class TopRatedCarouselFragment: CarouselFragment() {
     private val refreshModel: MainViewModel by activityViewModels()
@@ -49,15 +39,16 @@ class TopRatedCarouselFragment: CarouselFragment() {
         viewModel.loadFirstPage()
 
         viewModel.items.observe(viewLifecycleOwner) {
-            onReceiveData(it)
-        }
-        viewModel.error.observe(viewLifecycleOwner) {
-            onReceiveError(it)
+            when(it) {
+                is RequestStatus.Error -> onReceiveError(it.e)
+                is RequestStatus.Loading -> setLoadingState()
+                is RequestStatus.ObjSuccess -> onReceiveData(it.data)
+            }
         }
 
         MoviesAdapter.itemOnClick = ::onSelectItem
         binding.recyclerView.apply {
-            adapter = MoviesAdapter(emptyArray())
+            adapter = MoviesAdapter(emptyList())
             layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         }
 
@@ -77,7 +68,14 @@ class TopRatedCarouselFragment: CarouselFragment() {
         (activity as ListingRouter).openTopRatedListing()
     }
 
-    private fun onReceiveData(items: Array<Movie>) {
+    private fun setLoadingState() {
+        binding.topRatedSpinner.visibility = View.VISIBLE
+        binding.errorPanel.visibility = View.GONE
+        binding.itemMore.visibility = View.GONE
+        setTableData(emptyList())
+    }
+
+    private fun onReceiveData(items: List<Movie>) {
         binding.topRatedSpinner.visibility = View.GONE
         binding.errorPanel.visibility = View.GONE
         binding.itemMore.visibility = View.VISIBLE
@@ -88,11 +86,11 @@ class TopRatedCarouselFragment: CarouselFragment() {
         binding.topRatedSpinner.visibility = View.GONE
         binding.errorPanel.visibility = View.VISIBLE
         binding.itemMore.visibility = View.GONE
-        setTableData(emptyArray(), false)
+        setTableData(emptyList(), false)
         Toast.makeText(activity, ex.toString(), Toast.LENGTH_SHORT).show()
     }
 
-    private fun setTableData(items: Array<Movie>, increment: Boolean = true) {
+    private fun setTableData(items: List<Movie>, increment: Boolean = true) {
         binding.recyclerView.apply {
             (adapter as MoviesAdapter).let { carouselAdapter ->
                 carouselAdapter.dataSet = if (increment) carouselAdapter.dataSet + items else items
