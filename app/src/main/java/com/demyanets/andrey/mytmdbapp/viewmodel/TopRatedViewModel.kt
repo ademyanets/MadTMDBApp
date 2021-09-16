@@ -11,7 +11,7 @@ import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.convert
 import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
-import com.demyanets.andrey.mytmdbapp.repository.TmdbDatasource
+import com.demyanets.andrey.mytmdbapp.repository.TmdbApiRetrofitService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,8 +42,8 @@ class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
         currentPage = page
         isLoading = true
 
-        val client = RetrofitClient.getClient()
-        val ds = client.create(TmdbDatasource::class.java)
+        val client = RetrofitClient.getTmdbClient()
+        val ds = client.create(TmdbApiRetrofitService::class.java)
 
         _items.value = RequestStatus.Loading
 

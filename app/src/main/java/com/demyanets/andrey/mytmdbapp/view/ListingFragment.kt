@@ -112,7 +112,7 @@ class ListingFragment: Fragment() {
     //! Callback. When user selects a movie from list
     private fun onSelectItem(movie: Movie) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
-        (activity as MainActivity).openDetails(movie)
+        (activity as? Router)?.openDetails(movie)
     }
 
     override fun onDestroyView() {

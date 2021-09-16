@@ -15,7 +15,7 @@ object RetrofitClient {
 
     private var retrofit: Retrofit? = null
 
-    fun getClient(): Retrofit {
+    fun getTmdbClient(): Retrofit {
         if (retrofit == null) {
             val client = OkHttpClient
                 .Builder()

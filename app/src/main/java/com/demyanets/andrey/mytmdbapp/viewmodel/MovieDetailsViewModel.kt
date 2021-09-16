@@ -4,16 +4,18 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.demyanets.andrey.mytmdbapp.model.MovieDetails
 import com.demyanets.andrey.mytmdbapp.model.RequestStatus
-import com.demyanets.andrey.mytmdbapp.model.dto.MovieDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.convertToEntity
-import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
-import com.demyanets.andrey.mytmdbapp.repository.TmdbDatasource
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.demyanets.andrey.mytmdbapp.repository.TmdbApi
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.lang.Exception
+import javax.inject.Inject
 
-class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
+@HiltViewModel
+class MovieDetailsViewModel @Inject constructor(
+    private val api: TmdbApi,
+    private val state: SavedStateHandle
+    ) : ViewModel() {
+
     companion object {
         const val SaveKey = "movie-details-id"
     }
@@ -21,7 +23,7 @@ class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
     private val _movie = MutableLiveData<RequestStatus<MovieDetails>>()
     val data: LiveData<RequestStatus<MovieDetails>> = _movie
 
-    private var repo = RetrofitClient.getClient().create(TmdbDatasource::class.java)
+//    private var repo = RetrofitClient.getClient().create(TmdbApiRetrofitService::class.java)
 
     fun getMovie(id: Int) {
         if (!state.contains(SaveKey) || state.get<Int>(SaveKey) != id) {
@@ -32,22 +34,39 @@ class MovieDetailsViewModel(private val state: SavedStateHandle): ViewModel() {
 
     private fun doRequest(id: Int) {
         _movie.value = RequestStatus.Loading
-        repo.getMoviewDetails(id).enqueue( object : Callback<MovieDTO> {
-            override fun onFailure(call: Call<MovieDTO>, t: Throwable) {
-                Log.d("GGG", t.toString())
-                _movie.value = RequestStatus.Error(Exception(t.localizedMessage))
-            }
-            override fun onResponse(call: Call<MovieDTO>, response: Response<MovieDTO>) {
-                response.body()?.let {
-                    val value: MovieDetails? = it.convertToEntity()
+
+        api.getMovie(id) {
+            when(it) {
+                is RequestStatus.Error -> _movie.value = RequestStatus.Error(it.e)
+                is RequestStatus.ObjSuccess -> {
+                    val value: MovieDetails? = it.data.convertToEntity()
                     if (value != null) {
                         _movie.value = RequestStatus.ObjSuccess(value!!)
                     } else {
                         Log.d("GGG", "MovieDetails convertion error")
-                        _movie.value = RequestStatus.Error(Exception("MovieDetails convertion error"))
+                        _movie.value = RequestStatus.Error(Exception("MovieDetails conversion error"))
                     }
                 }
+                RequestStatus.Loading -> TODO() //callback status doesn't need this
             }
-        })
+        }
+
+//        repo.getMoviewDetails(id).enqueue( object : Callback<MovieDTO> {
+//            override fun onFailure(call: Call<MovieDTO>, t: Throwable) {
+//                Log.d("GGG", t.toString())
+//                _movie.value = RequestStatus.Error(Exception(t.localizedMessage))
+//            }
+//            override fun onResponse(call: Call<MovieDTO>, response: Response<MovieDTO>) {
+//                response.body()?.let {
+//                    val value: MovieDetails? = it.convertToEntity()
+//                    if (value != null) {
+//                        _movie.value = RequestStatus.ObjSuccess(value!!)
+//                    } else {
+//                        Log.d("GGG", "MovieDetails convertion error")
+//                        _movie.value = RequestStatus.Error(Exception("MovieDetails convertion error"))
+//                    }
+//                }
+//            }
+//        })
     }
 }

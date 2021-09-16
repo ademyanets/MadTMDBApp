@@ -6,7 +6,7 @@ import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import retrofit2.Call
 import retrofit2.http.*
 
-interface TmdbDatasource {
+interface TmdbApiRetrofitService {
 //    @Headers( "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1YTY2MjVmZDcxMjEwNTYxZTIyOTYwMTQ2YmMzOWRiOSIsInN1YiI6IjYxMTEyYjMxNGE1MmY4MDA1Y2M3NzBmYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.1JrkvhI5zPB-yf6m3cKk6M65xx_UHCVbWTBuJWsY3PA")
     @GET("movie/top_rated")
     fun getTopRatedList(

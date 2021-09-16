@@ -7,11 +7,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.demyanets.andrey.mytmdbapp.Common
-import com.demyanets.andrey.mytmdbapp.ListingRouter
+import com.demyanets.andrey.mytmdbapp.Router
 import com.demyanets.andrey.mytmdbapp.model.Genre
 import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.RequestStatus
-import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.GenreListingViewModel
 import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
@@ -67,12 +66,12 @@ class GenreItemsCarouselFragment: CarouselFragment() {
     //! Callback. When user selects a movie from list
     private fun onSelectItem(movie: Movie) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
-        (activity as ListingRouter).openDetails(movie)
+        (activity as? Router)?.openDetails(movie)
     }
 
     private fun moreButtonClick(genre: Genre) {
         Toast.makeText(activity, genre.name, Toast.LENGTH_LONG).show()
-        (activity as ListingRouter).openListing(genre)
+        (activity as? Router)?.openListing(genre)
     }
 
     private fun setLoadingState() {

@@ -11,7 +11,7 @@ import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.convert
 import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
-import com.demyanets.andrey.mytmdbapp.repository.TmdbDatasource
+import com.demyanets.andrey.mytmdbapp.repository.TmdbApiRetrofitService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -34,7 +34,7 @@ class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
         get() = state.get<Int>(TotalPagesKey) ?: 0
         set(value) { state[TotalPagesKey] = value }
     private var isLoading: Boolean = false
-    private var repo = RetrofitClient.getClient().create(TmdbDatasource::class.java)
+    private var repo = RetrofitClient.getTmdbClient().create(TmdbApiRetrofitService::class.java)
 
     fun setGenreAndLoad(genre: Int) {
         if (!state.contains(GenreKey) || state.get<Int>(GenreKey) != genre) {

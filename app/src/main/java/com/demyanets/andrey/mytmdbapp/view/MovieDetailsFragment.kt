@@ -15,11 +15,15 @@ import com.demyanets.andrey.mytmdbapp.*
 import com.demyanets.andrey.mytmdbapp.databinding.DetailsFragmentBinding
 import com.demyanets.andrey.mytmdbapp.model.MovieDetails
 import com.demyanets.andrey.mytmdbapp.model.RequestStatus
+import com.demyanets.andrey.mytmdbapp.repository.TmdbApiImpl
 import com.demyanets.andrey.mytmdbapp.viewmodel.MovieDetailsViewModel
+import com.demyanets.andrey.mytmdbapp.viewmodel.TmdbViewModelFactoryImpl
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.BufferedReader
 import java.lang.Exception
 import java.util.stream.Collectors
 
+@AndroidEntryPoint
 class MovieDetailsFragment: Fragment() {
 
     private var _binding: DetailsFragmentBinding? = null

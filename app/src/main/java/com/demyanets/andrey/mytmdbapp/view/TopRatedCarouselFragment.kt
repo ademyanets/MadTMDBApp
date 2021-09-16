@@ -3,11 +3,10 @@ package com.demyanets.andrey.mytmdbapp.view
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.demyanets.andrey.mytmdbapp.ListingRouter
+import com.demyanets.andrey.mytmdbapp.Router
 import com.demyanets.andrey.mytmdbapp.R
 import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.RequestStatus
@@ -60,12 +59,12 @@ class TopRatedCarouselFragment: CarouselFragment() {
     //! Callback. When user selects a movie from list
     private fun onSelectItem(movie: Movie) {
         Toast.makeText(activity, movie.title, Toast.LENGTH_LONG).show()
-        (activity as ListingRouter).openDetails(movie)
+        (activity as Router).openDetails(movie)
     }
 
     private fun moreButtonClick() {
         Toast.makeText(activity, R.string.top_rated_hint, Toast.LENGTH_LONG).show()
-        (activity as ListingRouter).openTopRatedListing()
+        (activity as Router).openTopRatedListing()
     }
 
     private fun setLoadingState() {

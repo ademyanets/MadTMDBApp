@@ -24,7 +24,7 @@ import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
 //TODO: extract into sealed class whatever..
 
 
-interface ListingRouter {
+interface Router {
     fun openDetails(movie: Movie)
     fun openListing(genre: Genre)
     fun openTopRatedListing()
@@ -37,7 +37,7 @@ fun GenreItemsCarouselFragment.setGenre(genre: Genre): CarouselFragment {
     return this
 }
 
-class MainActivity : AppCompatActivity(), ListingRouter {
+class MainActivity : AppCompatActivity(), Router {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by viewModels()
@@ -91,6 +91,12 @@ class MainActivity : AppCompatActivity(), ListingRouter {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
+    //! Router interface impl
     override fun openDetails(movie: Movie) {
         val intent = Intent(this, OtherActivity::class.java).apply {
             putExtra(Common.MovieKey, movie.id)
@@ -112,46 +118,6 @@ class MainActivity : AppCompatActivity(), ListingRouter {
         startActivity(intent)
     }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        if (item.itemId == R.id.action_search) {
-//            Log.d("GGGG", "TODO: perform search")
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
 
-//    fun switchToMovieDetailsFragment(movie: ResultDTO) {
-//        val detailsFragment: MovieDetailsFragment = MovieDetailsFragment()
-//        val args = Bundle()
-//        args.putInt("id", movie.id) //TODO: try parcelable
-//        detailsFragment.arguments = args
-//
-//        supportFragmentManager.commit {
-//            setCustomAnimations(
-//                R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out
-//            )
-//            replace(R.id.fragment_container, detailsFragment)
-//            addToBackStack(null)
-//        }
-//    }
-
-//    override fun openDetailsFragment(movie: ResultDTO) {
-//        val detailsFragment: MovieDetailsFragment = MovieDetailsFragment()
-//        val args = Bundle()
-//        args.putInt("id", movie.id) //TODO: try parcelable
-//        detailsFragment.arguments = args
-//
-//        supportFragmentManager.commit {
-//            setCustomAnimations(
-//                R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out
-//            )
-//            replace(R.id.fragment_container, detailsFragment)
-//            addToBackStack(null)
-//        }
-//    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
 }
 
