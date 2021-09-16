@@ -19,8 +19,10 @@ import com.demyanets.andrey.mytmdbapp.model.RequestStatus
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ThreadPoolExecutor
 
+@AndroidEntryPoint
 class TopRatedFragment: Fragment() {
     private var _binding: TopRatedFragmentBinding? = null
     private val binding get() = _binding!!
@@ -77,7 +79,7 @@ class TopRatedFragment: Fragment() {
 
     private fun bindViewmodel() {
         viewModel.loadFirstPage()
-        viewModel.items.observe(viewLifecycleOwner) {
+        viewModel.data.observe(viewLifecycleOwner) {
             when(it) {
                 is RequestStatus.Error -> onReceiveError(it.e)
                 is RequestStatus.Loading -> setLoadingState()

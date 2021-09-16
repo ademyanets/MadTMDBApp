@@ -11,21 +11,30 @@ import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.convert
 import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
+import com.demyanets.andrey.mytmdbapp.repository.TmdbApi
 import com.demyanets.andrey.mytmdbapp.repository.TmdbApiRetrofitService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
+import javax.inject.Inject
 
-class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
+@HiltViewModel
+class GenreListingViewModel @Inject constructor(
+    private val api: TmdbApi,
+    private val state: SavedStateHandle
+    ) : ViewModel() {
+
     companion object {
         const val GenreKey = "listing-genre-id"
         const val CurrentPageKey = "listing-current"
         const val TotalPagesKey = "listing-total"
     }
 
-    private val _data = MutableLiveData<RequestStatus<List<Movie>>>()//MutableLiveData<Array<Movie>>()
+    private val _data = MutableLiveData<RequestStatus<List<Movie>>>()
     val data: LiveData<RequestStatus<List<Movie>>> = _data
+
     private var currentPage: Int
         get() = state.get<Int>(CurrentPageKey) ?: 0
         set(value) { state[CurrentPageKey] = value }
@@ -33,8 +42,8 @@ class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
     private var totalPages: Int
         get() = state.get<Int>(TotalPagesKey) ?: 0
         set(value) { state[TotalPagesKey] = value }
-    private var isLoading: Boolean = false
-    private var repo = RetrofitClient.getTmdbClient().create(TmdbApiRetrofitService::class.java)
+
+    private var isLoading: Boolean = false//FIXME:
 
     fun setGenreAndLoad(genre: Int) {
         if (!state.contains(GenreKey) || state.get<Int>(GenreKey) != genre) {
@@ -65,24 +74,27 @@ class GenreListingViewModel(private val state: SavedStateHandle) : ViewModel() {
         currentPage = page
         isLoading = true
 
-        repo.getGenreItemsList(genre, page).enqueue(object : Callback<PageResultDTO<ResultDTO>> {
-            override fun onFailure(call: Call<PageResultDTO<ResultDTO>>, t: Throwable) {
-                Log.d("GGG", t.toString())
-                _data.value = RequestStatus.Error(Exception(t.localizedMessage))
-                isLoading = false
-            }
-
-            override fun onResponse(
-                call: Call<PageResultDTO<ResultDTO>>,
-                response: Response<PageResultDTO<ResultDTO>>
-            ) {
-                response.body()?.let {
-                    totalPages = it.total_pages
-                    val items = it.results.map { it.convert() }.filterNotNull()
-                    _data.value = RequestStatus.ObjSuccess(items)
+        api.getGenreListing(genre, page) {
+            when (it) {
+                is RequestStatus.Error -> {
+                    Log.d("GGG", it.e.localizedMessage)
+                    _data.value = RequestStatus.Error(it.e)
+                    isLoading = false
                 }
-                isLoading = false
+                is RequestStatus.ObjSuccess -> {
+                    val items = it.data.results.map { it.convert() }.filterNotNull()
+                    if (items != null) {
+                        totalPages = it.data.total_pages
+                        _data.value = RequestStatus.ObjSuccess(items)
+                    } else {
+                        Log.d("GGG", "Genre ${genre} listing page ${page} conversion error")
+                        _data.value =
+                            RequestStatus.Error(Exception("Genre ${genre} listing page ${page} conversion error"))
+                    }
+                    isLoading = false
+                }
+                RequestStatus.Loading -> TODO()
             }
-        })
+        }
     }
 }

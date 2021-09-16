@@ -23,8 +23,6 @@ class MovieDetailsViewModel @Inject constructor(
     private val _movie = MutableLiveData<RequestStatus<MovieDetails>>()
     val data: LiveData<RequestStatus<MovieDetails>> = _movie
 
-//    private var repo = RetrofitClient.getClient().create(TmdbApiRetrofitService::class.java)
-
     fun getMovie(id: Int) {
         if (!state.contains(SaveKey) || state.get<Int>(SaveKey) != id) {
             doRequest(id)
@@ -50,23 +48,5 @@ class MovieDetailsViewModel @Inject constructor(
                 RequestStatus.Loading -> TODO() //callback status doesn't need this
             }
         }
-
-//        repo.getMoviewDetails(id).enqueue( object : Callback<MovieDTO> {
-//            override fun onFailure(call: Call<MovieDTO>, t: Throwable) {
-//                Log.d("GGG", t.toString())
-//                _movie.value = RequestStatus.Error(Exception(t.localizedMessage))
-//            }
-//            override fun onResponse(call: Call<MovieDTO>, response: Response<MovieDTO>) {
-//                response.body()?.let {
-//                    val value: MovieDetails? = it.convertToEntity()
-//                    if (value != null) {
-//                        _movie.value = RequestStatus.ObjSuccess(value!!)
-//                    } else {
-//                        Log.d("GGG", "MovieDetails convertion error")
-//                        _movie.value = RequestStatus.Error(Exception("MovieDetails convertion error"))
-//                    }
-//                }
-//            }
-//        })
     }
 }

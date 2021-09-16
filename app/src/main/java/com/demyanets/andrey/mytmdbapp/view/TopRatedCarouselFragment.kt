@@ -14,8 +14,10 @@ import com.demyanets.andrey.mytmdbapp.utils.stringResource
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
 import com.demyanets.andrey.mytmdbapp.viewmodel.TopRatedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.lang.Exception
 
+@AndroidEntryPoint
 class TopRatedCarouselFragment: CarouselFragment() {
     private val refreshModel: MainViewModel by activityViewModels()
     private val viewModel: TopRatedViewModel by viewModels()
@@ -37,7 +39,7 @@ class TopRatedCarouselFragment: CarouselFragment() {
 
         viewModel.loadFirstPage()
 
-        viewModel.items.observe(viewLifecycleOwner) {
+        viewModel.data.observe(viewLifecycleOwner) {
             when(it) {
                 is RequestStatus.Error -> onReceiveError(it.e)
                 is RequestStatus.Loading -> setLoadingState()

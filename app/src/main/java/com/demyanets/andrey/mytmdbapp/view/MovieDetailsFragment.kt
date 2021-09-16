@@ -25,12 +25,11 @@ import java.util.stream.Collectors
 
 @AndroidEntryPoint
 class MovieDetailsFragment: Fragment() {
-
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MovieDetailsViewModel by viewModels()
-    private var DEFAULT_ID: Int = 550 //Fight Club
-    private var movieId: Int = DEFAULT_ID
+    private var DEFAULT_ID: Int = 550 //Fight Club //FIXME:
+    private var movieId: Int = DEFAULT_ID //FIXME:
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

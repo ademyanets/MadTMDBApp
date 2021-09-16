@@ -11,22 +11,38 @@ import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.ResultDTO
 import com.demyanets.andrey.mytmdbapp.model.dto.convert
 import com.demyanets.andrey.mytmdbapp.repository.RetrofitClient
+import com.demyanets.andrey.mytmdbapp.repository.TmdbApi
 import com.demyanets.andrey.mytmdbapp.repository.TmdbApiRetrofitService
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
+import javax.inject.Inject
 
-class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
-    private val _items = MutableLiveData<RequestStatus<List<Movie>>>()
-    val items: LiveData<RequestStatus<List<Movie>>> = _items
+@HiltViewModel
+class TopRatedViewModel @Inject constructor(
+    private val api: TmdbApi,
+    private val state: SavedStateHandle
+    ) : ViewModel() {
 
-    private var currentPage: Int = 0
-    private var totalPages: Int = 0
+    private val _data = MutableLiveData<RequestStatus<List<Movie>>>()
+    val data: LiveData<RequestStatus<List<Movie>>> = _data
+
+    //FIXME: unify with GenreListingViewModel
+    private var currentPage: Int
+        get() = state.get<Int>(GenreListingViewModel.CurrentPageKey) ?: 0
+        set(value) { state[GenreListingViewModel.CurrentPageKey] = value }
+
+    private var totalPages: Int
+        get() = state.get<Int>(GenreListingViewModel.TotalPagesKey) ?: 0
+        set(value) { state[GenreListingViewModel.TotalPagesKey] = value }
+
     private var isLoading: Boolean = false
 
     fun loadFirstPage() {
-        loadPage(0)
+        loadPage(1)
     }
 
     fun loadNextPage() {
@@ -39,32 +55,32 @@ class TopRatedViewModel(private val state: SavedStateHandle) : ViewModel() {
     }
 
     private fun loadPage(page: Int) {
+
+        _data.value = RequestStatus.Loading
         currentPage = page
         isLoading = true
 
-        val client = RetrofitClient.getTmdbClient()
-        val ds = client.create(TmdbApiRetrofitService::class.java)
-
-        _items.value = RequestStatus.Loading
-
-        ds.getTopRatedList().enqueue(object : Callback<PageResultDTO<ResultDTO>> {
-            override fun onFailure(call: Call<PageResultDTO<ResultDTO>>, t: Throwable) {
-                Log.d("GGG", t.toString())
-                _items.value = RequestStatus.Error(Exception(t.localizedMessage))
-                isLoading = false
-            }
-
-            override fun onResponse(
-                call: Call<PageResultDTO<ResultDTO>>,
-                response: Response<PageResultDTO<ResultDTO>>
-            ) {
-                response.body()?.let {
-                    totalPages = it.total_pages
-                    val items = it.results.map { it.convert() }.filterNotNull()
-                    _items.value = RequestStatus.ObjSuccess(items)
+        api.getTopRated(page) {
+            when (it) {
+                is RequestStatus.Error -> {
+                    Log.d("GGG", it.e.localizedMessage)
+                    _data.value = RequestStatus.Error(it.e)
+                    isLoading = false
                 }
-                isLoading = false
+                is RequestStatus.ObjSuccess -> {
+                    val items = it.data.results.map { it.convert() }.filterNotNull()
+                    if (items != null) {
+                        totalPages = it.data.total_pages
+                        _data.value = RequestStatus.ObjSuccess(items)
+                    } else {
+                        Log.d("GGG", "Top rated listing page ${page} conversion error")
+                        _data.value =
+                            RequestStatus.Error(Exception("Top rated listing page ${page} conversion error"))
+                    }
+                    isLoading = false
+                }
+                RequestStatus.Loading -> TODO()
             }
-        })
+        }
     }
 }

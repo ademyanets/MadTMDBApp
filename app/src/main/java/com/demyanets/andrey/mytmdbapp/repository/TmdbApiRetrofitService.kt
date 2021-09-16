@@ -11,7 +11,7 @@ interface TmdbApiRetrofitService {
     @GET("movie/top_rated")
     fun getTopRatedList(
         //@Query("api_key") apikey: String = Common.tmdbApiKey ): Call<PageResultDTO<ResultDTO>>
-        ): Call<PageResultDTO<ResultDTO>>
+        @Query("page") page: Int): Call<PageResultDTO<ResultDTO>>
 
     @GET("discover/movie")
     fun getGenreItemsList(

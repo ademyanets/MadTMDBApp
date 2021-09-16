@@ -20,6 +20,8 @@ import com.demyanets.andrey.mytmdbapp.view.CarouselFragment
 import com.demyanets.andrey.mytmdbapp.view.GenreItemsCarouselFragment
 import com.demyanets.andrey.mytmdbapp.view.TopRatedCarouselFragment
 import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 
 //TODO: extract into sealed class whatever..
 
@@ -37,6 +39,7 @@ fun GenreItemsCarouselFragment.setGenre(genre: Genre): CarouselFragment {
     return this
 }
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), Router {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
@@ -117,7 +120,5 @@ class MainActivity : AppCompatActivity(), Router {
         }
         startActivity(intent)
     }
-
-
 }
 

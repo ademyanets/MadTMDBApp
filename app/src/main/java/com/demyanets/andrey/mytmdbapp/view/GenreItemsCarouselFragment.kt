@@ -14,12 +14,14 @@ import com.demyanets.andrey.mytmdbapp.model.RequestStatus
 import com.demyanets.andrey.mytmdbapp.view.adapters.MoviesAdapter
 import com.demyanets.andrey.mytmdbapp.viewmodel.GenreListingViewModel
 import com.demyanets.andrey.mytmdbapp.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.lang.Exception
 
+@AndroidEntryPoint //FIXME: why is not enough to mark activity with @AndroidEntryPoint? By now if miss annotation here hilt can't find constructor for VM
 class GenreItemsCarouselFragment: CarouselFragment() {
     private val refreshModel: MainViewModel by activityViewModels()
     private val viewModel: GenreListingViewModel by viewModels()
-    var genre: Genre? = null
+    var genre: Genre? = null//FIXME:
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
