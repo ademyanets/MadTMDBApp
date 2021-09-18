@@ -21,11 +21,10 @@ import java.lang.Exception
 class GenreItemsCarouselFragment: CarouselFragment() {
     private val refreshModel: MainViewModel by activityViewModels()
     private val viewModel: GenreListingViewModel by viewModels()
-    var genre: Genre? = null//FIXME:
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        genre = arguments?.getParcelable(Common.GenreKey)
+        viewModel.genre = arguments?.getParcelable(Common.GenreKey)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,33 +33,34 @@ class GenreItemsCarouselFragment: CarouselFragment() {
     }
 
     private fun bindViewModel() {
-        genre?.let { genre ->
-            binding.itemTitle.text = genre.name
 
-            refreshModel.reloadFlag.observe(viewLifecycleOwner) {
-                viewModel.loadFirstPage(genre.id)
-            }
+        binding.itemTitle.text = viewModel.genre?.name
 
-            viewModel.setGenreAndLoad(genre.id)
-            viewModel.data.observe(viewLifecycleOwner) {
-                when(it) {
-                    is RequestStatus.Error -> onReceiveError(it.e)
-                    is RequestStatus.Loading -> setLoadingState()
-                    is RequestStatus.ObjSuccess<List<Movie>> -> {
-                        onReceiveData(it.data)
-                    }
+        refreshModel.reloadFlag.observe(viewLifecycleOwner) {
+            viewModel.loadFirstPage()
+        }
+
+        viewModel.loadFirstPage()
+        viewModel.data.observe(viewLifecycleOwner) {
+            when(it) {
+                is RequestStatus.Error -> onReceiveError(it.e)
+                is RequestStatus.Loading -> setLoadingState()
+                is RequestStatus.ObjSuccess<List<Movie>> -> {
+                    onReceiveData(it.data)
                 }
             }
+        }
 
-            MoviesAdapter.Companion.itemOnClick = ::onSelectItem
+        MoviesAdapter.Companion.itemOnClick = ::onSelectItem
 
-            binding.recyclerView.apply {
-                adapter = MoviesAdapter(emptyList())
-                layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-            }
+        binding.recyclerView.apply {
+            adapter = MoviesAdapter(emptyList())
+            layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        }
 
-            binding.itemMore.setOnClickListener {
-                moreButtonClick(genre)
+        binding.itemMore.setOnClickListener {
+            viewModel.genre?.let {
+                moreButtonClick(it)
             }
         }
     }

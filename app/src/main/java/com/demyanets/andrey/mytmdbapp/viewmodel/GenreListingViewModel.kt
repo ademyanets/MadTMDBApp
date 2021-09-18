@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.demyanets.andrey.mytmdbapp.model.Genre
 import com.demyanets.andrey.mytmdbapp.model.Movie
 import com.demyanets.andrey.mytmdbapp.model.RequestStatus
 import com.demyanets.andrey.mytmdbapp.model.dto.PageResultDTO
@@ -27,13 +28,17 @@ class GenreListingViewModel @Inject constructor(
     ) : ViewModel() {
 
     companion object {
-        const val GenreKey = "listing-genre-id"
+        const val GENRE_KEY = "listing-genre-id"
         const val CurrentPageKey = "listing-current"
         const val TotalPagesKey = "listing-total"
     }
 
     private val _data = MutableLiveData<RequestStatus<List<Movie>>>()
     val data: LiveData<RequestStatus<List<Movie>>> = _data
+
+    var genre: Genre?
+        get() = state.get<Genre>(GENRE_KEY)
+        set(value) { state[GENRE_KEY] = value }
 
     private var currentPage: Int
         get() = state.get<Int>(CurrentPageKey) ?: 0
@@ -45,27 +50,20 @@ class GenreListingViewModel @Inject constructor(
 
     private var isLoading: Boolean = false//FIXME:
 
-    fun setGenreAndLoad(genre: Int) {
-        if (!state.contains(GenreKey) || state.get<Int>(GenreKey) != genre) {
-            loadFirstPage(genre)
-            state[GenreKey] = genre
-        }
+    fun loadFirstPage() {
+        loadPage(genre?.id,1)
     }
 
-    fun loadFirstPage(genre: Int) {
-        loadPage(genre,1)
-    }
-
-    fun loadNextPage(genre: Int) {
+    fun loadNextPage() {
         if (isLoading) {
             return
         } else if (currentPage == totalPages - 1) {
             return
         }
-        loadPage(genre,currentPage + 1)//FIXME:
+        loadPage(genre?.id,currentPage + 1)//FIXME:
     }
 
-    private fun loadPage(genre: Int, page: Int) {
+    private fun loadPage(genre: Int?, page: Int) {
         if (genre == null) {
             throw ExceptionInInitializerError()
         }

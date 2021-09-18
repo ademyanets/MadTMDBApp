@@ -26,11 +26,10 @@ class ListingFragment: Fragment() {
     private var _binding: ListingFragmentBinding? = null
     private val binding get() = _binding!!
     private val viewModel: GenreListingViewModel by viewModels()
-    private var genre: Genre? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        genre = arguments?.getParcelable(Common.GenreKey)
+        viewModel.genre = arguments?.getParcelable(Common.GenreKey)
     }
 
     override fun onCreateView(
@@ -55,7 +54,7 @@ class ListingFragment: Fragment() {
                 binding.topRatedSpinner.visibility = View.VISIBLE
                 it.dataSet = emptyList()
                 it.notifyDataSetChanged()
-                viewModel.loadFirstPage(genre!!.id)//FIXME:
+                viewModel.loadFirstPage()
                 binding.swipeContainer.isRefreshing = false
             }
         }
@@ -71,7 +70,7 @@ class ListingFragment: Fragment() {
                         if ((layoutManager as LinearLayoutManager).findLastVisibleItemPosition() == it.itemCount - 1) {
                             Toast.makeText(activity, R.string.load_hint, Toast.LENGTH_SHORT).show()
                             binding.topRatedSpinner.visibility = View.VISIBLE
-                            viewModel.loadNextPage(genre!!.id)//FIXME:
+                            viewModel.loadNextPage()
                         }
                     }
                 }
@@ -80,10 +79,6 @@ class ListingFragment: Fragment() {
     }
 
     private fun bindViewmodel() {
-        genre?.let {
-            viewModel.setGenreAndLoad(it.id)
-        }
-
         viewModel.data.observe(viewLifecycleOwner) {
             when(it) {
                 is RequestStatus.Error -> onReceiveError(it.e)
@@ -91,6 +86,7 @@ class ListingFragment: Fragment() {
                 is RequestStatus.ObjSuccess -> onReceiveData(it.data)
             }
         }
+        viewModel.loadFirstPage()
     }
 
     private fun onReceiveData(items: List<Movie>) {

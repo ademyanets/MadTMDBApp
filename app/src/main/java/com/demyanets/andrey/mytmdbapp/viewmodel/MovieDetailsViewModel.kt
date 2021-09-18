@@ -17,16 +17,20 @@ class MovieDetailsViewModel @Inject constructor(
     ) : ViewModel() {
 
     companion object {
-        const val SaveKey = "movie-details-id"
+        const val NOT_SET = 0
+        const val SAVE_KEY = "movie-details-id"
     }
+
+    var id: Int
+        get() = state.get<Int>(SAVE_KEY) ?: NOT_SET
+        set(value) { state[SAVE_KEY] = value }
 
     private val _movie = MutableLiveData<RequestStatus<MovieDetails>>()
     val data: LiveData<RequestStatus<MovieDetails>> = _movie
 
-    fun getMovie(id: Int) {
-        if (!state.contains(SaveKey) || state.get<Int>(SaveKey) != id) {
+    fun getMovie() {
+        if (id != NOT_SET) {
             doRequest(id)
-            state[SaveKey] = id
         }
     }
 

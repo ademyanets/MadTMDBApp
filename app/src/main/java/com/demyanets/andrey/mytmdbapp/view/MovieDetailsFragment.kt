@@ -28,12 +28,12 @@ class MovieDetailsFragment: Fragment() {
     private var _binding: DetailsFragmentBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MovieDetailsViewModel by viewModels()
-    private var DEFAULT_ID: Int = 550 //Fight Club //FIXME:
-    private var movieId: Int = DEFAULT_ID //FIXME:
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        movieId = arguments?.getInt("id") ?: DEFAULT_ID
+        arguments?.getInt("id")?.let {
+            viewModel.id = it
+        }
     }
 
     override fun onCreateView(
@@ -48,7 +48,7 @@ class MovieDetailsFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getMovie(movieId)
+        viewModel.getMovie()
         viewModel.data.observe(viewLifecycleOwner) { status ->
             when(status) {
                 is RequestStatus.Error -> { exc: Exception ->
